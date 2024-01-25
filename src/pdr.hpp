@@ -17,7 +17,7 @@ struct PatientRecord {
 };
 
 class PDR {
- public:
+public:
   using Callback = std::function<void()>;
   void collect_data();
   void save_data();
@@ -31,18 +31,18 @@ class PDR {
     Menu_Callback = std::move(callback);
   }
 
- private:
+private:
   PatientRecord patient;
   Callback Menu_Callback;
 
   // sanitization
-  bool valid_ssn(const std::string& ssn);
-  bool valid_name(const std::string& name);
-  bool valid_state(const std::string& state);
-  bool valid_zip(const std::string& zip);
+  bool valid_ssn(const std::string &ssn);
+  bool valid_name(const std::string &name);
+  bool valid_state(const std::string &state);
+  bool valid_zip(const std::string &zip);
   bool validate_input();
 
-  std::string input_prompt(const std::string& prompt);
+  std::string input_prompt(const std::string &prompt, bool clear);
   std::string set_fname();
   std::string set_minitial();
   std::string set_lname();
@@ -52,5 +52,5 @@ class PDR {
   std::string set_zip();
   std::string set_ssn();
 
-  std::string get_input(const std::string& input);
+  std::string get_input(const std::string &input);
 };
