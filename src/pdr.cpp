@@ -1,7 +1,9 @@
 #include "pdr.hpp"
-#include <iostream>
 
 std::string PDR::input_prompt(const std::string &prompt, bool clear) {
+  if (clear)
+    clear_input_buffer();
+
   std::cout << prompt;
   std::string input;
   getline(std::cin, input);
@@ -18,9 +20,10 @@ std::string PDR::get_input(const std::string &input) {
     if (choice == 'Q' && input.size() == 1)
       throw UserQuitException();
 
+    return input;
+
     std::cout << "Invalid option. Please try again." << std::endl;
   }
-  return input;
 }
 
 std::string PDR::set_fname() {
