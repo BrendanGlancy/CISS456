@@ -26,35 +26,25 @@ std::string PDR::get_input(const std::string &input) {
   }
 }
 
-std::string PDR::set_fname() {
-  return get_input(input_prompt("First Name: ", true));
-}
+std::string PDR::set_fname() { return input_prompt("First Name: ", false); }
 
 std::string PDR::set_minitial() {
-  return get_input(input_prompt("Middle Initial: ", false));
+  return input_prompt("Middle Initial: ", true);
 }
 
-std::string PDR::set_lname() {
-  return get_input(input_prompt("Last Name: ", false));
-}
+std::string PDR::set_lname() { return input_prompt("Last Name: ", false); }
 
 std::string PDR::set_ssn() {
-  return get_input(input_prompt("Social Security Number: ", false));
+  return input_prompt("Social Security Number: ", false);
 }
 
-std::string PDR::set_address() {
-  return get_input(input_prompt("Address: ", false));
-}
+std::string PDR::set_address() { return input_prompt("Address: ", false); }
 
-std::string PDR::set_city() { return get_input(input_prompt("City: ", false)); }
+std::string PDR::set_city() { return input_prompt("City: ", false); }
 
-std::string PDR::set_state() {
-  return get_input(input_prompt("State Code: ", false));
-}
+std::string PDR::set_state() { return input_prompt("State Code: ", false); }
 
-std::string PDR::set_zip() {
-  return get_input(input_prompt("Zip Code: ", false));
-}
+std::string PDR::set_zip() { return input_prompt("Zip Code: ", false); }
 
 void PDR::collect_data() {
   try {
