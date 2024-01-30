@@ -4,8 +4,10 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "../lib/Exceptions.hpp"
 #include "../lib/header.h"
@@ -40,7 +42,9 @@ private:
   bool valid_name(const std::string &name);
   bool valid_state(const std::string &state);
   bool valid_zip(const std::string &zip);
-  bool validate_input();
+  std::string
+  get_valid_input(const std::string &prompt,
+                  const std::function<bool(const std::string &)> &validator);
 
   std::string input_prompt(const std::string &prompt, bool clear);
   std::string set_fname();

@@ -1,8 +1,8 @@
 First Name: Brendan
 Middle Initial: P
 Last Name: Glancy
-Social Security: 4472-
-Address: 1385 Circle Hill Road
-City: Norht cant
-State Code: oh
+Social Security: 123456789
+Address: 1385 Circle Hill Rd
+City: Canton
+State Code: OH
 Zip: 44720

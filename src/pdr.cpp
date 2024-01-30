@@ -46,18 +46,153 @@ std::string PDR::set_state() { return input_prompt("State Code: ", false); }
 
 std::string PDR::set_zip() { return input_prompt("Zip Code: ", false); }
 
+bool PDR::valid_ssn(const std::string &ssn) {
+  // SSN must be 9 digits or 11 characters including dashes
+  if (ssn.length() != 9 && ssn.length() != 11)
+    return false;
+
+  for (size_t i = 0; i < ssn.length(); ++i) {
+    if (i == 3 || i == 6) {
+      if (ssn.length() == 11 && ssn[i] != '-')
+        return false; // Dashes at correct positions
+    } else {
+      if (!isdigit(ssn[i]))
+        return false; // Every other character must be a digit
+    }
+  }
+  return true;
+}
+
+bool PDR::valid_name(const std::string &name) {
+  if (name.empty())
+    return false;
+
+  for (char c : name) {
+    if (!isalpha(c) && c != '-' && c != '\'')
+      return false;
+  }
+  return true;
+}
+
+bool PDR::valid_state(const std::string &state) {
+  const std::set<std::string> valid_states = {
+      "AL", // Alabama
+      "AK", // Alaska
+      "AZ", // Arizona
+      "AR", // Arkansas
+      "CA", // California
+      "CO", // Colorado
+      "CT", // Connecticut
+      "DE", // Delaware
+      "FL", // Florida
+      "GA", // Georgia
+      "HI", // Hawaii
+      "ID", // Idaho
+      "IL", // Illinois
+      "IN", // Indiana
+      "IA", // Iowa
+      "KS", // Kansas
+      "KY", // Kentucky
+      "LA", // Louisiana
+      "ME", // Maine
+      "MD", // Maryland
+      "MA", // Massachusetts
+      "MI", // Michigan
+      "MN", // Minnesota
+      "MS", // Mississippi
+      "MO", // Missouri
+      "MT", // Montana
+      "NE", // Nebraska
+      "NV", // Nevada
+      "NH", // New Hampshire
+      "NJ", // New Jersey
+      "NM", // New Mexico
+      "NY", // New York
+      "NC", // North Carolina
+      "ND", // North Dakota
+      "OH", // Ohio
+      "OK", // Oklahoma
+      "OR", // Oregon
+      "PA", // Pennsylvania
+      "RI", // Rhode Island
+      "SC", // South Carolina
+      "SD", // South Dakota
+      "TN", // Tennessee
+      "TX", // Texas
+      "UT", // Utah
+      "VT", // Vermont
+      "VA", // Virginia
+      "WA", // Washington
+      "WV", // West Virginia
+      "WI", // Wisconsin
+      "WY"  // Wyoming
+  };
+  return valid_states.find(state) != valid_states.end();
+}
+
+bool PDR::valid_zip(const std::string &zip) {
+  if (zip.length() != 5 && zip.length() != 10)
+    return false;
+
+  for (size_t i = 0; i < zip.length(); ++i) {
+    if (i == 5) {
+      if (zip[i] != '-')
+        return false; // If length is 10, position 6 must be a hyphen
+    } else {
+      if (!isdigit(zip[i]))
+        return false; // Every other character must be a digit
+    }
+  }
+  return true;
+}
+
+std::string PDR::get_valid_input(
+    const std::string &prompt,
+    const std::function<bool(const std::string &)> &validator) {
+  std::string input;
+  do {
+    input = input_prompt(prompt, false);
+    if (!validator(input)) {
+      std::cout << "Invalid input. Please try again." << std::endl;
+    }
+  } while (!validator(input));
+  return input;
+}
+
 void PDR::collect_data() {
   try {
-    patient.firstName = PDR::set_fname();
-    patient.middleInitial = PDR::set_minitial();
-    patient.lastName = PDR::set_lname();
-    patient.ssn = PDR::set_ssn();
-    patient.address = PDR::set_address();
-    patient.city = PDR::set_city();
-    patient.stateCode = PDR::set_state();
-    patient.zip = PDR::set_zip();
+    patient.firstName =
+        get_valid_input("First Name: ", [this](const std::string &input) {
+          return valid_name(input);
+        });
+    patient.middleInitial =
+        get_valid_input("Middle Initial: ", [this](const std::string &input) {
+          return valid_name(input);
+        });
+    patient.lastName =
+        get_valid_input("Last Name: ", [this](const std::string &input) {
+          return valid_name(input);
+        });
+    patient.ssn = get_valid_input(
+        "Social Security Number: ",
+        [this](const std::string &input) { return valid_ssn(input); });
+    patient.address =
+        get_valid_input("Address: ", [this](const std::string &input) {
+          return true;
+        }); // Assuming address validation always returns true for now
+    patient.city = get_valid_input(
+        "City: ", [this](const std::string &input) { return true; });
+    patient.stateCode =
+        get_valid_input("State Code: ", [this](const std::string &input) {
+          return valid_state(input);
+        });
+    patient.zip =
+        get_valid_input("Zip Code: ", [this](const std::string &input) {
+          return valid_zip(input);
+        });
 
   } catch (const std::exception &e) {
+    std::cerr << "An error occurred: " << e.what() << std::endl;
     if (Menu_Callback) {
       Menu_Callback();
     }
