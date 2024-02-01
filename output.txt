@@ -1,8 +1,8 @@
-First Name: Brendan
-Middle Initial: P
-Last Name: Glancy
-Social Security: 123456789
-Address: 1385 Circle Hill Rd.
-City: North Canton
-State Code: OH
-Zip: 44720
+Sal
+,A
+,Ad
+,123456789
+,17 bolo
+,Boston
+,OH
+,44444
