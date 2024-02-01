@@ -239,14 +239,16 @@ void PDR::save_data() {
   if (!outputFile.is_open()) {
     throw std::runtime_error("Error opening file");
   }
-  outputFile << patient.firstName << "\n"
-             << "," << patient.middleInitial << "\n"
-             << "," << patient.lastName << "\n"
-             << "," << patient.ssn << "\n"
-             << "," << patient.address << "\n"
-             << "," << patient.city << "\n"
-             << "," << patient.stateCode << "\n"
-             << "," << patient.zip << "\n";
-  outputFile.close();
+outputFile << "\"" << patient.firstName << "\","
+           << "\"" << patient.middleInitial << "\","
+           << "\"" << patient.lastName << "\","
+           << "\"" << patient.ssn << "\","
+           << "\"" << patient.address << "\","
+           << "\"" << patient.city << "\","
+           << "\"" << patient.stateCode << "\","
+           << "\"" << patient.zip << "\"\n";
+outputFile.close();
+
+
 }
 
