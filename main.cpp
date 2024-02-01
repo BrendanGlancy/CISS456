@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 
 #include "lib/header.h"
@@ -40,30 +41,29 @@ int main() {
   welcome();
 
   while (running) {
-    if (count > 0)
-      infoHeader(message);
+    if (count > 0) infoHeader(message);
     displayMenu();
 
     int choice = getChoice();
     count++;
 
     switch (choice) {
-    case 1:
-      handleCollectData(patient, message, patient_objs);
-      break;
-    case 2:
-      handleStoreData(patient, message);
-      break;
-    case 3:
-      break;
-    case 4:
-      clear_console();
-      reset_text_color();
-      running = false;
-      break;
-    default:
-      std::cout << "Invalid choice" << std::endl;
-      break;
+      case 1:
+        handleCollectData(patient, message, patient_objs);
+        break;
+      case 2:
+        handleStoreData(patient, message);
+        break;
+      case 3:
+        break;
+      case 4:
+        clear_console();
+        reset_text_color();
+        running = false;
+        break;
+      default:
+        std::cout << "Invalid choice" << std::endl;
+        break;
     }
   }
 

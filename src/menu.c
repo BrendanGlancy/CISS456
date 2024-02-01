@@ -59,7 +59,7 @@ int getChoice() {
   int choice;
   while (1) {
     scanf("%d", &choice);
-    if (choice < 1 || choice > 6) {
+    if (choice < 1 || choice > 4) {
       gotoxy(5, 19, 31);
       printf("Invalid choice, please try again: ");
     } else {
