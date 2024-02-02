@@ -1,8 +1,1 @@
-Sal
-,A
-,Ally
-,123456789
-,170 booli
-,Tburg
-,OH
-,12345
+Brendan, P, Glancy, 123456789, Circle Hill Rd, North Canton, OH, 44720
