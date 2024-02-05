@@ -44,6 +44,9 @@ int get_choice() {
         break;
       }
     }
+
+    gotoxy(16, 20, 34);
+    printf("Invalid Input, Try again: ");
   }
 
   return choice;
