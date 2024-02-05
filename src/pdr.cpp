@@ -1,4 +1,5 @@
 #include "pdr.hpp"
+
 #include <algorithm>
 #include <cctype>
 
@@ -11,18 +12,20 @@ std::string PDR::input_prompt(const std::string &prompt) {
   std::cout << prompt;
   std::string input;
   getline(std::cin, input);
-  if (input == "q" || input == "Q")
-    throw UserQuitException();
+  if (input == "q" || input == "Q") throw UserQuitException();
 
   return input;
 }
 
+/**
+ * Returns the input unless its a q, then we throw
+ * @UserQuitException which is s a callback to the main menu
+ */
 std::string PDR::get_input(const std::string &input) {
   while (true) {
     char choice = toupper(input_prompt(input)[0]);
 
-    if (choice == 'Q' && input.size() == 1)
-      throw UserQuitException();
+    if (choice == 'Q' && input.size() == 1) throw UserQuitException();
 
     return input;
 
@@ -30,6 +33,12 @@ std::string PDR::get_input(const std::string &input) {
   }
 }
 
+/**
+ * All the below function simply pass a prompt such as "First Name: "
+ * @returns the field we are looking for as type string
+ * if we need input validation, we call a seperate input validation function the
+ * check
+ */
 std::string PDR::set_fname() {
   std::string input;
   do {
@@ -101,7 +110,7 @@ std::string PDR::set_state() {
   do {
     input = input_prompt("State Code (EX: NY): ");
     std::transform(input.begin(), input.end(), input.begin(),
-                   ::toupper); // converts the entire state code to upper
+                   ::toupper);  // converts the entire state code to upper
     if (!valid_state(input)) {
       std::cout << "Invalid State Code. Please try again." << std::endl;
     }
@@ -122,110 +131,105 @@ std::string PDR::set_zip() {
 
 bool PDR::valid_ssn(const std::string &ssn) {
   // SSN must be 9 digits or 11 characters including dashes
-  if (ssn.length() != 9 && ssn.length() != 11)
-    return false;
+  if (ssn.length() != 9 && ssn.length() != 11) return false;
 
   for (size_t i = 0; i < ssn.length(); ++i) {
     if (i == 3 || i == 6) {
       if (ssn.length() == 11 && ssn[i] != '-')
-        return false; // Dashes at correct positions
+        return false;  // Dashes at correct positions
     } else {
       if (!isdigit(ssn[i]))
-        return false; // Every other character must be a digit
+        return false;  // Every other character must be a digit
     }
   }
   return true;
 }
 
 bool PDR::valid_name(const std::string &name) {
-  if (name.empty())
-    return false;
+  if (name.empty()) return false;
 
   for (char c : name) {
-    if (!isalpha(c) && c != '-' && c != '\'')
-      return false;
+    if (!isalpha(c) && c != '-' && c != '\'') return false;
   }
   return true;
 }
 
 bool PDR::valid_initial(const std::string &name) {
-  if (name.empty())
-    return false;
+  if (name.empty()) return false;
 
   for (char c : name) {
-    if (!isalpha(c) && c != '-' && c != '\'' && name.size() > 1)
-      return false;
+    // check if this is and alpha, and not - or '
+    if (!isalpha(c) && c != '-' && c != '\'' && name.size() > 1) return false;
   }
   return true;
 }
 
 bool PDR::valid_state(const std::string &state) {
   const std::set<std::string> valid_states = {
-      "AL", // Alabama
-      "AK", // Alaska
-      "AZ", // Arizona
-      "AR", // Arkansas
-      "CA", // California
-      "CO", // Colorado
-      "CT", // Connecticut
-      "DE", // Delaware
-      "FL", // Florida
-      "GA", // Georgia
-      "HI", // Hawaii
-      "ID", // Idaho
-      "IL", // Illinois
-      "IN", // Indiana
-      "IA", // Iowa
-      "KS", // Kansas
-      "KY", // Kentucky
-      "LA", // Louisiana
-      "ME", // Maine
-      "MD", // Maryland
-      "MA", // Massachusetts
-      "MI", // Michigan
-      "MN", // Minnesota
-      "MS", // Mississippi
-      "MO", // Missouri
-      "MT", // Montana
-      "NE", // Nebraska
-      "NV", // Nevada
-      "NH", // New Hampshire
-      "NJ", // New Jersey
-      "NM", // New Mexico
-      "NY", // New York
-      "NC", // North Carolina
-      "ND", // North Dakota
-      "OH", // Ohio
-      "OK", // Oklahoma
-      "OR", // Oregon
-      "PA", // Pennsylvania
-      "RI", // Rhode Island
-      "SC", // South Carolina
-      "SD", // South Dakota
-      "TN", // Tennessee
-      "TX", // Texas
-      "UT", // Utah
-      "VT", // Vermont
-      "VA", // Virginia
-      "WA", // Washington
-      "WV", // West Virginia
-      "WI", // Wisconsin
-      "WY"  // Wyoming
+      "AL",  // Alabama
+      "AK",  // Alaska
+      "AZ",  // Arizona
+      "AR",  // Arkansas
+      "CA",  // California
+      "CO",  // Colorado
+      "CT",  // Connecticut
+      "DE",  // Delaware
+      "FL",  // Florida
+      "GA",  // Georgia
+      "HI",  // Hawaii
+      "ID",  // Idaho
+      "IL",  // Illinois
+      "IN",  // Indiana
+      "IA",  // Iowa
+      "KS",  // Kansas
+      "KY",  // Kentucky
+      "LA",  // Louisiana
+      "ME",  // Maine
+      "MD",  // Maryland
+      "MA",  // Massachusetts
+      "MI",  // Michigan
+      "MN",  // Minnesota
+      "MS",  // Mississippi
+      "MO",  // Missouri
+      "MT",  // Montana
+      "NE",  // Nebraska
+      "NV",  // Nevada
+      "NH",  // New Hampshire
+      "NJ",  // New Jersey
+      "NM",  // New Mexico
+      "NY",  // New York
+      "NC",  // North Carolina
+      "ND",  // North Dakota
+      "OH",  // Ohio
+      "OK",  // Oklahoma
+      "OR",  // Oregon
+      "PA",  // Pennsylvania
+      "RI",  // Rhode Island
+      "SC",  // South Carolina
+      "SD",  // South Dakota
+      "TN",  // Tennessee
+      "TX",  // Texas
+      "UT",  // Utah
+      "VT",  // Vermont
+      "VA",  // Virginia
+      "WA",  // Washington
+      "WV",  // West Virginia
+      "WI",  // Wisconsin
+      "WY"   // Wyoming
   };
   return valid_states.find(state) != valid_states.end();
 }
 
 bool PDR::valid_zip(const std::string &zip) {
-  if (zip.length() != 5 && zip.length() != 10)
-    return false;
+  if (zip.length() != 5 && zip.length() != 10) return false;
 
   for (size_t i = 0; i < zip.length(); ++i) {
     if (i == 5) {
       if (zip[i] != '-')
-        return false; // If length is 10, position 6 must be a hyphen
+        return false;  // If length is 10, position 6 must be a hyphen
     } else {
       if (!isdigit(zip[i]))
-        return false; // Every other character must be a digit
+        return false;  // Every other character must be a digit
     }
   }
   return true;
