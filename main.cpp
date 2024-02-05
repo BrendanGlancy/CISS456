@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+#include <stdio.h>
 #include <vector>
 
 #include "lib/header.h"
@@ -12,7 +14,7 @@ void handleCollectData(std::vector<PDR *> &patient_info, char *message,
   patient_objs = patient_info.size();
   clear_console();
   snprintf(message, sizeof("   Data save success   "),
-           "%d patient object(s) created", patient_objs);
+           "%d pdr object(s) created", patient_objs);
   pdr_prompt();
   patient_info.back()->collect_data();
 }
@@ -29,6 +31,24 @@ void handleStoreData(std::vector<PDR *> &patients, char *message) {
   }
 }
 
+int get_choice() {
+  std::string input;
+  int choice;
+
+  while (true) {
+    getline(std::cin, input);
+    std::istringstream stream(input);
+
+    if (stream >> choice) {
+      if (stream.eof()) {
+        break;
+      }
+    }
+  }
+
+  return choice;
+}
+
 int main() {
   int count = 0;
   int patient_objs = 0;
@@ -41,29 +61,30 @@ int main() {
   welcome();
 
   while (running) {
-    if (count > 0) infoHeader(message);
+    if (count > 0)
+      infoHeader(message);
     displayMenu();
 
-    int choice = getChoice();
+    int choice = get_choice();
     count++;
 
     switch (choice) {
-      case 1:
-        handleCollectData(patient, message, patient_objs);
-        break;
-      case 2:
-        handleStoreData(patient, message);
-        break;
-      case 3:
-        break;
-      case 4:
-        clear_console();
-        reset_text_color();
-        running = false;
-        break;
-      default:
-        std::cout << "Invalid choice" << std::endl;
-        break;
+    case 1:
+      handleCollectData(patient, message, patient_objs);
+      break;
+    case 2:
+      handleStoreData(patient, message);
+      break;
+    case 3:
+      break;
+    case 4:
+      clear_console();
+      reset_text_color();
+      running = false;
+      break;
+    default:
+      std::cout << "Invalid choice" << std::endl;
+      break;
     }
   }
 
