@@ -1,13 +1,27 @@
-# Specify the default compiler
-COMPILER ?= CLANG
+# Detect the operating system
+UNAME_S := $(shell uname -s)
+
+# Specify the default compiler based on the operating system
+ifeq ($(UNAME_S),Linux)
+  COMPILER ?= GCC
+else ifeq ($(UNAME_S),Darwin)
+  COMPILER ?= CLANG
+else ifeq ($(OS),Windows_NT)
+  COMPILER ?= MSVC
+else
+  COMPILER ?= GCC
+endif
 
 # Specify the compilers
 ifeq ($(COMPILER),CLANG)
   CXX = clang++
   CC = clang
-else
+else ifeq ($(COMPILER),GCC)
   CXX = g++
   CC = gcc
+else ifeq ($(COMPILER),MSVC)
+  CXX = cl
+  CC = cl
 endif
 
 # Specify compiler flags
