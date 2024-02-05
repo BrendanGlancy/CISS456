@@ -1,5 +1,12 @@
 #include "pdr.hpp"
+#include <algorithm>
+#include <cctype>
 
+/**
+ * Seperate function to display the prompt for an input
+ * This is because we are checking for q or Q every time incase
+ * the user wants to quit
+ */
 std::string PDR::input_prompt(const std::string &prompt) {
   std::cout << prompt;
   std::string input;
@@ -93,6 +100,8 @@ std::string PDR::set_state() {
   std::string input;
   do {
     input = input_prompt("State Code (EX: NY): ");
+    std::transform(input.begin(), input.end(), input.begin(),
+                   ::toupper); // converts the entire state code to upper
     if (!valid_state(input)) {
       std::cout << "Invalid State Code. Please try again." << std::endl;
     }
