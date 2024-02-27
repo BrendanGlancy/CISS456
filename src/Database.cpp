@@ -3,6 +3,13 @@
 #include <functional>
 #include <iostream>
 
+/**
+ * For this we need to:
+ *   1. Remove everything have to do with the car struct
+ *   2. We are going to start with a valid state table
+ *   3. Then we are going to have a PDR table
+ */
+
 Database::Database() {
   int rc = sqlite3_open("./docs/database.db", &db);
   if (rc) {
@@ -10,6 +17,7 @@ Database::Database() {
   }
 }
 
+// this is where we need to create the tables
 void Database::seed_db() {
   const std::string sql = "CREATE TABLE IF NOT EXISTS vehicle_configuration ("
                           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -37,6 +45,9 @@ bool Database::prepare_stmt(const char *sql, sqlite3_stmt **stmt) {
   return true;
 }
 
+// Notice a pattern, we just take everything in the car struct and bind it, so
+// to update this for this class we just need to bind everything in the new pdr
+// struct
 void Database::bind_stmt(sqlite3_stmt *stmt, const Car &data) {
   sqlite3_bind_text(stmt, 1, data.dealer_name.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 2, data.memo.c_str(), -1, SQLITE_TRANSIENT);
@@ -64,30 +75,34 @@ void Database::execute_sql(const std::string &sql, const std::string &msg) {
   }
 }
 
-void Database::insert_db(const Car &data) {
-  const char *sql = "INSERT INTO vehicle_configuration ("
-                    "vehicle_dealer,"
-                    "vehicle_memo,"
-                    "vehicle_color,"
-                    "vehicle_engine,"
-                    "vehicle_cargoOrPassenger,"
-                    "vehicle_cargoRoofline,"
-                    "vehicle_wheelbase,"
-                    "vehicle_make,"
-                    "vehicle_model,"
-                    "vehicle_year,"
-                    "vehicle_price) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+// this one is specifically for deliverable 2
+void Database::insert_state(const Car &data) {
+  const char *sql = "INSERT INTO states ("
+                    "valid_state,"
+                    "VALUES (?);";
   sqlite3_stmt *stmt;
 
   if (prepare_stmt(sql, &stmt)) {
     bind_stmt(stmt, data);
-    sql_error(stmt, "Error inserting vehicle_configuration data: ");
+    sql_error(stmt, "Error inserting state codes data: ");
+  }
+}
+
+// this one is look forward a liitle bit, this is going to all user data
+void Database::insert_pdr(const PDR &data) {
+  const char *sql = "INSERT INTO states ("
+                    "valid_state,"
+                    "VALUES (?);";
+  sqlite3_stmt *stmt;
+
+  if (prepare_stmt(sql, &stmt)) {
+    bind_stmt(stmt, data);
+    sql_error(stmt, "Error inserting state codes data: ");
   }
 }
 
 void Database::query_all() {
-  const char *sql = "SELECT * FROM vehicle_configuration;";
+  const char *sql = "SELECT * FROM states;";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) == SQLITE_OK) {
@@ -103,6 +118,7 @@ void Database::query_all() {
               << std::endl;
 }
 
+// update this to reflect the healthcare version of this project
 void Database::display_db(sqlite3_stmt *stmt) {
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     printf("============================================\n");
@@ -125,6 +141,7 @@ void Database::display_db(sqlite3_stmt *stmt) {
   }
 }
 
+// the below can stay
 void Database::sql_error(sqlite3_stmt *stmt, std::string msg) {
   if (sqlite3_step(stmt) != SQLITE_DONE) {
     std::cerr << msg << sqlite3_errmsg(db) << std::endl;
@@ -154,6 +171,7 @@ void Database::update_db() {
   }
 }
 
+// this just need to be modified
 std::string Database::col_choice() {
   // TODO: improve the keys names
   std::unordered_map<char, std::string> columns = {
