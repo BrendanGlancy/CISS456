@@ -1,6 +1,6 @@
 #pragma once
 #include "../lib/header.h"
-#include "VehicleConfiguration.hpp"
+#include "pdr.hpp"
 #include <filesystem>
 #include <sqlite3.h>
 
@@ -26,7 +26,7 @@ public:
    *
    * @param data The car data to be inserted into the database.
    */
-  void insert_db(const Car &data);
+  void insert_db(const PatientRecord &data);
 
   /**
    * Queries and displays all car records in the database.
@@ -78,6 +78,6 @@ private:
   bool prepare_stmt(const char *sql, sqlite3_stmt **stmt);
   std::string col_choice();
   std::string get_update();
-  void bind_stmt(sqlite3_stmt *stmt, const Car &data);
+  void bind_stmt(sqlite3_stmt *stmt, const PatientRecord &data);
   int get_id();
 };

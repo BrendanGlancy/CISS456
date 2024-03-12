@@ -1,5 +1,6 @@
 #include "Database.hpp"
 
+
 #include <functional>
 #include <iostream>
 
@@ -19,21 +20,18 @@ Database::Database() {
 
 // this is where we need to create the tables
 void Database::seed_db() {
-  const std::string sql = "CREATE TABLE IF NOT EXISTS vehicle_configuration ("
+  const std::string sql = "CREATE TABLE IF NOT EXISTS Patient_Data_Record ("
                           "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "vehicle_dealer TEXT NOT NULL,"
-                          "vehicle_memo TEXT NOT NULL,"
-                          "vehicle_color TEXT NOT NULL,"
-                          "vehicle_engine TEXT NOT NULL,"
-                          "vehicle_cargoOrPassenger TEXT NOT NULL,"
-                          "vehicle_cargoRoofline TEXT NOT NULL,"
-                          "vehicle_wheelbase TEXT NOT NULL,"
-                          "vehicle_make TEXT NOT NULL,"
-                          "vehicle_model TEXT NOT NULL,"
-                          "vehicle_year INTEGER NOT NULL,"
-                          "vehicle_price INTEGER NOT NULL);";
+                          "pdr_firstname TEXT NOT NULL,"
+                          "pdr_middleinitial TEXT NOT NULL,"
+                          "pdr_lastname TEXT NOT NULL,"
+                          "pdr_ssn TEXT NOT NULL,"
+                          "pdr_address TEXT NOT NULL,"
+                          "pdr_city TEXT NOT NULL,"
+                          "pdr_state TEXT NOT NULL,"
+                          "pdr_zipcode TEXT NOT NULL";
 
-  execute_sql(sql, "Error creating vehicle_configuration table: ");
+  execute_sql(sql, "Error creating Patient_Data_Record table: ");
 }
 
 bool Database::prepare_stmt(const char *sql, sqlite3_stmt **stmt) {
@@ -48,19 +46,18 @@ bool Database::prepare_stmt(const char *sql, sqlite3_stmt **stmt) {
 // Notice a pattern, we just take everything in the car struct and bind it, so
 // to update this for this class we just need to bind everything in the new pdr
 // struct
-void Database::bind_stmt(sqlite3_stmt *stmt, const Car &data) {
-  sqlite3_bind_text(stmt, 1, data.dealer_name.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 2, data.memo.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 3, data.color.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 4, data.ev_ic.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 5, data.cargo_passenger.c_str(), -1,
+void Database::bind_stmt(sqlite3_stmt *stmt, const PatientRecord &data) {
+  sqlite3_bind_text(stmt, 0, data.id.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 1, data.fname.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, data.minitial.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, data.lname.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, data.ssn.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 5, data.address.c_str(), -1,
                     SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 6, data.cargo_roofline.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 7, data.wheelbase.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 8, data.make.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 9, data.model.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_int(stmt, 10, data.year);
-  sqlite3_bind_int(stmt, 11, data.price);
+  sqlite3_bind_text(stmt, 6, data.city.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 7, data.state.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 8, data.zip.c_str(), -1, SQLITE_TRANSIENT);
+
 }
 
 void Database::execute_sql(const std::string &sql, const std::string &msg) {
@@ -76,7 +73,7 @@ void Database::execute_sql(const std::string &sql, const std::string &msg) {
 }
 
 // this one is specifically for deliverable 2
-void Database::insert_state(const Car &data) {
+void Database::insert_state(const PatientRecord &data) {
   const char *sql = "INSERT INTO states ("
                     "valid_state,"
                     "VALUES (?);";
@@ -88,7 +85,7 @@ void Database::insert_state(const Car &data) {
   }
 }
 
-// this one is look forward a liitle bit, this is going to all user data
+// this one is look forward a little bit, this is going to all user data
 void Database::insert_pdr(const PDR &data) {
   const char *sql = "INSERT INTO states ("
                     "valid_state,"
@@ -122,20 +119,17 @@ void Database::query_all() {
 void Database::display_db(sqlite3_stmt *stmt) {
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     printf("============================================\n");
-    std::cout << "ID: " << sqlite3_column_int(stmt, 0) << std::endl;
-    std::cout << "Dealer: " << sqlite3_column_text(stmt, 1) << std::endl;
-    std::cout << "Memo: " << sqlite3_column_text(stmt, 2) << std::endl;
-    std::cout << "Color: " << sqlite3_column_text(stmt, 3) << std::endl;
-    std::cout << "Engine: " << sqlite3_column_text(stmt, 4) << std::endl;
-    std::cout << "Cargo or Passenger: " << sqlite3_column_text(stmt, 5)
+    std::cout << "id: " << sqlite3_column_int(stmt, 0) << std::endl;
+    std::cout << "First Name: " << sqlite3_column_int(stmt, 1) << std::endl;
+    std::cout << "Middle Initial: " << sqlite3_column_text(stmt, 2) << std::endl;
+    std::cout << "Last Name: " << sqlite3_column_text(stmt, 3) << std::endl;
+    std::cout << "Social Security Number: " << sqlite3_column_text(stmt, 4) << std::endl;
+    std::cout << "Address: " << sqlite3_column_text(stmt, 5) << std::endl;
+    std::cout << "City: " << sqlite3_column_text(stmt, 6)
               << std::endl;
-    std::cout << "Cargo Roofline: " << sqlite3_column_text(stmt, 6)
+    std::cout << "State: " << sqlite3_column_text(stmt, 7)
               << std::endl;
-    std::cout << "Wheelbase: " << sqlite3_column_text(stmt, 7) << std::endl;
-    std::cout << "Make: " << sqlite3_column_text(stmt, 8) << std::endl;
-    std::cout << "Model: " << sqlite3_column_text(stmt, 9) << std::endl;
-    std::cout << "Year: " << sqlite3_column_int(stmt, 10) << std::endl;
-    std::cout << "Price: " << sqlite3_column_int(stmt, 11) << std::endl;
+    std::cout << "Zip: " << sqlite3_column_text(stmt, 8) << std::endl;
     std::cout << std::endl;
     printf("============================================\n");
   }
@@ -175,26 +169,24 @@ void Database::update_db() {
 std::string Database::col_choice() {
   // TODO: improve the keys names
   std::unordered_map<char, std::string> columns = {
-      {'d', "vehicle_dealer"},
-      {'m', "vehicle_memo"},
-      {'c', "vehicle_color"},
-      {'e', "vehicle_engine"},
-      {'c', "vehicle_cargoOrPassenger"},
-      {'r', "vehicle_cargoRoofline"},
-      {'w', "vehicle_wheelbase"},
-      {'!', "vehicle_make"},
-      {'#', "vehicle_model"},
-      {'y', "vehicle_year"},
-      {'p', "vehicle_price"}};
+      {'i', "id"},
+      {'f', "patient_FirstName"},
+      {'m', "patient_MiddleInitial"},
+      {'l', "patient_LastName"},
+      {'s', "patient_SSN"},
+      {'a', "patient_Address"},
+      {'c', "patient_City"},
+      {'s', "patient_State"},
+      {'z', "patient_ZipCode"},};
 
   std::cout
-      << "Which column would you like to update? (d) Dealer, (m) Memo, (c) "
-         "Color, (e) Engine, (c) Cargo or Passenger, (r) Cargo Roofline, (w) "
-         "Wheelbase, (!) Make, (#) Model, (y) Year, (p) Price: ";
+      << "Which column would you like to update? (i) ID, (f) First Name, (m) Middle Initial, (l) "
+         "Last Name, (s) Social Security Number, (a) Address, (c) City, (s) "
+         "State, (z) Zip Code";
   char column;
   std::cin >> column;
 
-  std::string sql = "UPDATE vehicle_configuration SET " + columns[column] +
+  std::string sql = "UPDATE Patient_Data_Record SET " + columns[column] +
                     " = ? WHERE id = ?;";
   return sql;
 }
@@ -208,12 +200,12 @@ std::string Database::get_update() {
 
 void Database::delete_db() {
   int delete_id = get_id();
-  const char *sql = "DELETE FROM vehicle_configuration WHERE id = ?;";
+  const char *sql = "DELETE FROM Patient_Data_Record WHERE id = ?;";
   sqlite3_stmt *stmt;
 
   if (prepare_stmt(sql, &stmt)) {
     sqlite3_bind_int(stmt, 1, delete_id);
-    sql_error(stmt, "Error inserting vehicle_configuration data: ");
+    sql_error(stmt, "Error inserting Patient_Data_Record data: ");
   }
 }
 
