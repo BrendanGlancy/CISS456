@@ -40,6 +40,9 @@ public:
    */
   void update_db();
 
+  void insert_pdr(const PatientRecord &data);
+  void insert_state(const PatientRecord &data);
+
   /**
    * Deletes car records from the database.
    * This method should include logic to remove specific records.

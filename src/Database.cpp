@@ -1,4 +1,5 @@
 #include "Database.hpp"
+#include "pdr.hpp"
 
 #include <functional>
 #include <iostream>
@@ -46,14 +47,13 @@ bool Database::prepare_stmt(const char *sql, sqlite3_stmt **stmt) {
 // to update this for this class we just need to bind everything in the new pdr
 // struct
 void Database::bind_stmt(sqlite3_stmt *stmt, const PatientRecord &data) {
-  sqlite3_bind_text(stmt, 0, data.id.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 1, data.fname.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 2, data.minitial.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 3, data.lname.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 1, data.firstName.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, data.middleInitial.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, data.lastName.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 4, data.ssn.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 5, data.address.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 6, data.city.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 7, data.state.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 7, data.stateCode.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 8, data.zip.c_str(), -1, SQLITE_TRANSIENT);
 }
 
@@ -83,7 +83,7 @@ void Database::insert_state(const PatientRecord &data) {
 }
 
 // this one is look forward a little bit, this is going to all user data
-void Database::insert_pdr(const PDR &data) {
+void Database::insert_pdr(const PatientRecord &data) {
   const char *sql = "INSERT INTO states ("
                     "valid_state,"
                     "VALUES (?);";
