@@ -1,6 +1,5 @@
 #include "Database.hpp"
 
-
 #include <functional>
 #include <iostream>
 
@@ -52,12 +51,10 @@ void Database::bind_stmt(sqlite3_stmt *stmt, const PatientRecord &data) {
   sqlite3_bind_text(stmt, 2, data.minitial.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 3, data.lname.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 4, data.ssn.c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 5, data.address.c_str(), -1,
-                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 5, data.address.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 6, data.city.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 7, data.state.c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_text(stmt, 8, data.zip.c_str(), -1, SQLITE_TRANSIENT);
-
 }
 
 void Database::execute_sql(const std::string &sql, const std::string &msg) {
@@ -121,14 +118,14 @@ void Database::display_db(sqlite3_stmt *stmt) {
     printf("============================================\n");
     std::cout << "id: " << sqlite3_column_int(stmt, 0) << std::endl;
     std::cout << "First Name: " << sqlite3_column_int(stmt, 1) << std::endl;
-    std::cout << "Middle Initial: " << sqlite3_column_text(stmt, 2) << std::endl;
+    std::cout << "Middle Initial: " << sqlite3_column_text(stmt, 2)
+              << std::endl;
     std::cout << "Last Name: " << sqlite3_column_text(stmt, 3) << std::endl;
-    std::cout << "Social Security Number: " << sqlite3_column_text(stmt, 4) << std::endl;
+    std::cout << "Social Security Number: " << sqlite3_column_text(stmt, 4)
+              << std::endl;
     std::cout << "Address: " << sqlite3_column_text(stmt, 5) << std::endl;
-    std::cout << "City: " << sqlite3_column_text(stmt, 6)
-              << std::endl;
-    std::cout << "State: " << sqlite3_column_text(stmt, 7)
-              << std::endl;
+    std::cout << "City: " << sqlite3_column_text(stmt, 6) << std::endl;
+    std::cout << "State: " << sqlite3_column_text(stmt, 7) << std::endl;
     std::cout << "Zip: " << sqlite3_column_text(stmt, 8) << std::endl;
     std::cout << std::endl;
     printf("============================================\n");
@@ -177,10 +174,12 @@ std::string Database::col_choice() {
       {'a', "patient_Address"},
       {'c', "patient_City"},
       {'s', "patient_State"},
-      {'z', "patient_ZipCode"},};
+      {'z', "patient_ZipCode"},
+  };
 
   std::cout
-      << "Which column would you like to update? (i) ID, (f) First Name, (m) Middle Initial, (l) "
+      << "Which column would you like to update? (i) ID, (f) First Name, (m) "
+         "Middle Initial, (l) "
          "Last Name, (s) Social Security Number, (a) Address, (c) City, (s) "
          "State, (z) Zip Code";
   char column;
