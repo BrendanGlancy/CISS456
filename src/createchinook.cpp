@@ -2,6 +2,7 @@
 #include <sqlite3.h>
 #include <string>
 
+// figured it out, Need to change line 2 and 77 to a full path from our library. Ran it on desktop. was successful.
 // Enum for states
 enum States {
   AL,
