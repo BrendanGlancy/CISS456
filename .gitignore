@@ -9,6 +9,7 @@
 *.lo
 *.o
 *.obj
+!src/shell.obj  # This line re-includes shell.obj in the src folder
 
 # Precompiled Headers
 *.gch
@@ -34,4 +35,3 @@
 *.out
 *.app
 pdr_app
-
