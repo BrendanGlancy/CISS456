@@ -1,177 +1,58 @@
+#include "createchinook.hpp"
+
+#include <fstream>
 #include <iostream>
-#include <sqlite3.h>
-#include <string>
+#include <sstream>
 
-// figured it out, Need to change line 2 and 77 to a full path from our library. Ran it on desktop. was successful.
-// Enum for states
-enum States {
-  AL,
-  AK,
-  AZ,
-  AR,
-  CA,
-  CO,
-  CT,
-  DE,
-  FL,
-  GA,
-  HI,
-  ID,
-  IL,
-  IN,
-  IA,
-  KS,
-  KY,
-  LA,
-  ME,
-  MD,
-  MA,
-  MI,
-  MN,
-  MS,
-  MO,
-  MT,
-  NE,
-  NV,
-  NH,
-  NJ,
-  NM,
-  NY,
-  NC,
-  ND,
-  OH,
-  OK,
-  OR,
-  PA,
-  RI,
-  SC,
-  SD,
-  TN,
-  TX,
-  UT,
-  VT,
-  VA,
-  WA,
-  WV,
-  WI,
-  WY,
-  NUM_STATES // To keep track of the number of states
-};
-
-// Function to check if a state is valid
-bool isValidState(const char *state) {
-  for (int i = 0; i < NUM_STATES; ++i) {
-    if (state[0] == static_cast<char>('A' + i) &&
-        state[1] == static_cast<char>('L' + i)) {
-      return true;
-    }
+ChinookDB::ChinookDB() : db(nullptr) {
+  int rc = sqlite3_open("./docs/chinook.db", &db);
+  if (rc) {
+    std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
+    return;  // Early return to avoid further operations if open fails
   }
-  return false;
+  initialize_database();
 }
 
-// Function to create SQLite database
-int createDatabase(const char *state) {
-  sqlite3 *DB;
-  char *messageError;
-
-  int exit = sqlite3_open("chinook.db", &DB);
-
-  if (exit) {
-    std::cerr << "Error opening SQLite DB: " << sqlite3_errmsg(DB) << std::endl;
-    return -1;
-  } else {
-    std::cout << "Opened Database Successfully!" << std::endl;
+ChinookDB::~ChinookDB() {
+  if (db) {
+    sqlite3_close(db);
+    db = nullptr;  // Good practice to nullify pointer after deletion
   }
-
-  std::string sql = "CREATE TABLE IF NOT EXISTS STATES("
-                    "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    "STATE           CHAR(2)    NOT NULL);";
-
-  exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messageError);
-
-  if (exit != SQLITE_OK) {
-    std::cerr << "Error Create Table: " << messageError << std::endl;
-    sqlite3_free(messageError);
-    return -1;
-  } else {
-    std::cout << "Table created Successfully!" << std::endl;
-  }
-
-  // Insert data
-  sql = "INSERT INTO STATES (STATE) VALUES ('" + std::string(state) + "');";
-
-  exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &messageError);
-
-  if (exit != SQLITE_OK) {
-    std::cerr << "Error Insert: " << messageError << std::endl;
-    sqlite3_free(messageError);
-    return -1;
-  } else {
-    std::cout << "Record inserted Successfully!" << std::endl;
-  }
-
-  sqlite3_close(DB);
-
-  return 0;
 }
 
-// Function to fetch state abbreviation from database
-std::string fetchStateFromDatabase() {
-  sqlite3 *DB;
-  sqlite3_stmt *stmt;
-  const char *tail;
-  std::string state;
+void ChinookDB::initialize_database() {
+  execute_sql_file("./schema/schema.sql");
+  execute_sql_file("./schema/data.sql");
+}
 
-  int exit = sqlite3_open("chinook.db", &DB);
-
-  if (exit) {
-    std::cerr << "Error opening SQLite DB: " << sqlite3_errmsg(DB) << std::endl;
-    return "";
+void ChinookDB::execute_sql_file(const std::string& file_path) {
+  std::ifstream file(file_path);
+  if (!file.is_open()) {
+    std::cerr << "Failed to open SQL file: " << file_path << std::endl;
+    return;  // Early return if file can't be opened
   }
-
-  std::string sql = "SELECT STATE FROM STATES;";
-
-  exit = sqlite3_prepare_v2(DB, sql.c_str(), -1, &stmt, &tail);
-
-  if (exit != SQLITE_OK) {
-    std::cerr << "Error SELECT: " << sqlite3_errmsg(DB) << std::endl;
-    return "";
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  std::string sql_commands = buffer.str();
+  char* message_error = nullptr;
+  if (sqlite3_exec(db, sql_commands.c_str(), nullptr, nullptr,
+                   &message_error) != SQLITE_OK) {
+    std::cerr << "Error executing SQL file (" << file_path
+              << "): " << message_error << std::endl;
+    sqlite3_free(message_error);
   }
+}
 
-  if (sqlite3_step(stmt) == SQLITE_ROW) {
-    state = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+bool ChinookDB::is_valid_state(const std::string& state_code) {
+  std::string sql = "SELECT NAME FROM states WHERE code = ?;";
+  sqlite3_stmt* stmt = nullptr;
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return false;  // Early return if statement preparation fails
   }
-
+  sqlite3_bind_text(stmt, 1, state_code.c_str(), -1, SQLITE_STATIC);
+  bool isValid = sqlite3_step(stmt) == SQLITE_ROW;  // True if a row is returned
   sqlite3_finalize(stmt);
-  sqlite3_close(DB);
-
-  return state;
-}
-
-int main() {
-  // Fetch state abbreviation from database
-  std::string stateFromDB = fetchStateFromDatabase();
-
-  if (stateFromDB.empty()) {
-    std::cerr << "Error fetching state from database!" << std::endl;
-    return -1;
-  }
-
-  char state[3];
-  std::cout << "Enter state abbreviation (2 characters): ";
-  std::cin >> state;
-
-  // Check if state is valid
-  if (!isValidState(state)) {
-    std::cerr << "Invalid state abbreviation!" << std::endl;
-    return -1;
-  }
-
-  // Create database with state
-  if (createDatabase(state) != 0) {
-    std::cerr << "Error creating database!" << std::endl;
-    return -1;
-  }
-
-  return 0;
+  return isValid;
 }

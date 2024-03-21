@@ -110,11 +110,12 @@ std::string PDR::set_state() {
   do {
     input = input_prompt("State Code (EX: NY): ");
     std::transform(input.begin(), input.end(), input.begin(),
-                   ::toupper);  // converts the entire state code to upper
-    if (!valid_state(input)) {
+                   ::toupper);  // Convert to upper case
+    if (!db.is_valid_state(
+            input)) {  // Use the db instance for state validation
       std::cout << "Invalid State Code. Please try again." << std::endl;
     }
-  } while (!valid_state(input));
+  } while (!db.is_valid_state(input));
   return input;
 }
 
@@ -165,59 +166,7 @@ bool PDR::valid_initial(const std::string &name) {
 }
 
 bool PDR::valid_state(const std::string &state) {
-  const std::set<std::string> valid_states = {
-      "AL",  // Alabama
-      "AK",  // Alaska
-      "AZ",  // Arizona
-      "AR",  // Arkansas
-      "CA",  // California
-      "CO",  // Colorado
-      "CT",  // Connecticut
-      "DE",  // Delaware
-      "FL",  // Florida
-      "GA",  // Georgia
-      "HI",  // Hawaii
-      "ID",  // Idaho
-      "IL",  // Illinois
-      "IN",  // Indiana
-      "IA",  // Iowa
-      "KS",  // Kansas
-      "KY",  // Kentucky
-      "LA",  // Louisiana
-      "ME",  // Maine
-      "MD",  // Maryland
-      "MA",  // Massachusetts
-      "MI",  // Michigan
-      "MN",  // Minnesota
-      "MS",  // Mississippi
-      "MO",  // Missouri
-      "MT",  // Montana
-      "NE",  // Nebraska
-      "NV",  // Nevada
-      "NH",  // New Hampshire
-      "NJ",  // New Jersey
-      "NM",  // New Mexico
-      "NY",  // New York
-      "NC",  // North Carolina
-      "ND",  // North Dakota
-      "OH",  // Ohio
-      "OK",  // Oklahoma
-      "OR",  // Oregon
-      "PA",  // Pennsylvania
-      "RI",  // Rhode Island
-      "SC",  // South Carolina
-      "SD",  // South Dakota
-      "TN",  // Tennessee
-      "TX",  // Texas
-      "UT",  // Utah
-      "VT",  // Vermont
-      "VA",  // Virginia
-      "WA",  // Washington
-      "WV",  // West Virginia
-      "WI",  // Wisconsin
-      "WY"   // Wyoming
-  };
-  return valid_states.find(state) != valid_states.end();
+  return db.is_valid_state(state);  // Delegate to ChinookDB instance
 }
 
 bool PDR::valid_zip(const std::string &zip) {

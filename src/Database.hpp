@@ -1,14 +1,16 @@
 #pragma once
+#include <sqlite3.h>
+
+#include <filesystem>
+
 #include "../lib/header.h"
 #include "pdr.hpp"
-#include <filesystem>
-#include <sqlite3.h>
 
 /**
  * Class representing a database for managing car data.
  */
 class Database {
-public:
+ public:
   /**
    * Constructor for the Database class.
    * Initializes a new instance of the database.
@@ -72,7 +74,7 @@ public:
   // destructor
   ~Database();
 
-private:
+ private:
   sqlite3 *db;
   void connect();
   void display_db(sqlite3_stmt *stmt);

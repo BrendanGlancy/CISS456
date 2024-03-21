@@ -1,8 +1,9 @@
 #include "Database.hpp"
-#include "pdr.hpp"
 
 #include <functional>
 #include <iostream>
+
+#include "pdr.hpp"
 
 /**
  * For this we need to:
@@ -12,7 +13,7 @@
  */
 
 Database::Database() {
-  int rc = sqlite3_open("./docs/database.db", &db);
+  int rc = sqlite3_open("./docs/chinook.db", &db);
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
   }
@@ -20,16 +21,17 @@ Database::Database() {
 
 // this is where we need to create the tables
 void Database::seed_db() {
-  const std::string sql = "CREATE TABLE IF NOT EXISTS Patient_Data_Record ("
-                          "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                          "pdr_firstname TEXT NOT NULL,"
-                          "pdr_middleinitial TEXT NOT NULL,"
-                          "pdr_lastname TEXT NOT NULL,"
-                          "pdr_ssn TEXT NOT NULL,"
-                          "pdr_address TEXT NOT NULL,"
-                          "pdr_city TEXT NOT NULL,"
-                          "pdr_state TEXT NOT NULL,"
-                          "pdr_zipcode TEXT NOT NULL";
+  const std::string sql =
+      "CREATE TABLE IF NOT EXISTS Patient_Data_Record ("
+      "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+      "pdr_firstname TEXT NOT NULL,"
+      "pdr_middleinitial TEXT NOT NULL,"
+      "pdr_lastname TEXT NOT NULL,"
+      "pdr_ssn TEXT NOT NULL,"
+      "pdr_address TEXT NOT NULL,"
+      "pdr_city TEXT NOT NULL,"
+      "pdr_state TEXT NOT NULL,"
+      "pdr_zipcode TEXT NOT NULL";
 
   execute_sql(sql, "Error creating Patient_Data_Record table: ");
 }
@@ -71,9 +73,10 @@ void Database::execute_sql(const std::string &sql, const std::string &msg) {
 
 // this one is specifically for deliverable 2
 void Database::insert_state(const PatientRecord &data) {
-  const char *sql = "INSERT INTO states ("
-                    "valid_state,"
-                    "VALUES (?);";
+  const char *sql =
+      "INSERT INTO states ("
+      "valid_state,"
+      "VALUES (?);";
   sqlite3_stmt *stmt;
 
   if (prepare_stmt(sql, &stmt)) {
@@ -84,9 +87,10 @@ void Database::insert_state(const PatientRecord &data) {
 
 // this one is look forward a little bit, this is going to all user data
 void Database::insert_pdr(const PatientRecord &data) {
-  const char *sql = "INSERT INTO states ("
-                    "valid_state,"
-                    "VALUES (?);";
+  const char *sql =
+      "INSERT INTO states ("
+      "valid_state,"
+      "VALUES (?);";
   sqlite3_stmt *stmt;
 
   if (prepare_stmt(sql, &stmt)) {

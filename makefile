@@ -36,7 +36,7 @@ LDFLAGS = -lsqlite3
 TARGET = pdr_app
 
 # Separate C and C++ source files
-CPP_SOURCES = src/pdr.cpp src/Database.cpp main.cpp lib/Exceptions.cpp 
+CPP_SOURCES = src/pdr.cpp src/createchinook.cpp main.cpp lib/Exceptions.cpp 
 C_SOURCES = lib/common.c src/menu.c
 
 # Generate object files from sources
