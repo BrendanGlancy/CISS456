@@ -1,9 +1,16 @@
 # Detect the operating system
 UNAME_S := $(shell uname -s)
 
-# Specify the default compiler based on the operating system
+# Check if clang is installed
+CLANG_AVAILABLE := $(shell command -v clang++ >/dev/null 2>&1; echo $$?)
+
+# Specify the default compiler based on the operating system and availability of clang
 ifeq ($(UNAME_S),Linux)
-  COMPILER ?= GCC
+  ifeq ($(CLANG_AVAILABLE),0)
+    COMPILER ?= CLANG
+  else
+    COMPILER ?= GCC
+  endif
 else ifeq ($(UNAME_S),Darwin)
   COMPILER ?= CLANG
 else ifeq ($(OS),Windows_NT)
