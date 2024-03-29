@@ -20,10 +20,31 @@ ChinookDB::~ChinookDB() {
   }
 }
 
+bool ChinookDB::is_db_initialized() {
+  const char *check_query =
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='STATES';";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, check_query, -1, &stmt, nullptr) == SQLITE_OK) {
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+      sqlite3_finalize(stmt);
+      return true;  // The STATES table exists, indicating initialization has
+                    // occurred.
+    }
+    sqlite3_finalize(stmt);
+  }
+  return false;  // Initialization needed
+}
+
 void ChinookDB::initialize_database() {
-  execute_sql_file("./schema/schema.sql");
-  execute_sql_file("./schema/data.sql");
-  execute_sql_file("./schema/chinook.sql");
+  if (!is_db_initialized()) {
+    // Execute the initialization scripts only if the database hasn't been
+    // initialized yet.
+    execute_sql_file("./schema/schema.sql");
+    execute_sql_file("./schema/data.sql");
+    execute_sql_file("./schema/chinook.sql");
+  }
+  // Otherwise, do nothing as the database is already initialized.
 }
 
 void ChinookDB::execute_sql_file(const std::string &file_path) {
@@ -90,4 +111,50 @@ bool ChinookDB::is_valid_state(const std::string &state_code) {
 
   return isValid;  // Return the validity of the state code based on query
                    // result.
+}
+
+bool ChinookDB::is_user_admin(const std::string &user_id) {
+  std::string sql = "SELECT is_admin FROM user_permissions WHERE user_id = ?;";
+  sqlite3_stmt *stmt = nullptr;
+  bool is_admin = false;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return false;  // Statement preparation failed
+  }
+
+  sqlite3_bind_text(stmt, 1, user_id.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    is_admin = sqlite3_column_int(stmt, 0) !=
+               0;  // Assuming is_admin is stored as an integer (0 or 1)
+  }
+
+  sqlite3_finalize(stmt);
+  return is_admin;
+}
+
+void ChinookDB::view_tables() {
+  const char *sql =
+      "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    std::cout << "- " << sqlite3_column_text(stmt, 0) << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+
+  std::cout << "Press 'Enter' to return to the menu." << std::endl;
+  char input;
+  do {
+    input = getchar();  // Read the user input
+  } while (input != '\n');  // Wait until 'q' or 'Q' is pressed
 }

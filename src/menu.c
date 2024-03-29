@@ -21,8 +21,9 @@ void welcome() {
   gotoxy(2, 7, 36);
   printf("     \\/  \\/  \\___||_| \\___|\\___/ |_| |_| |_| \\___|(_)");
   gotoxy(0, 9, 34);
-  printf("========================================================="
-         "\n");
+  printf(
+      "========================================================="
+      "\n");
 }
 
 void displayMenu() {
@@ -33,9 +34,11 @@ void displayMenu() {
   gotoxy(16, 14, 32);
   printf("2. Save Patient Info");
   gotoxy(16, 15, 32);
-  printf("3. View Stored Orders (doesn't work)");
+  printf("3. Drop Tables");
+  gotoxy(16, 16, 32);
+  printf("4. View Tables");
   gotoxy(16, 18, 31);
-  printf("4. Exit");
+  printf("5. Exit");
   gotoxy(16, 20, 34);
   printf("Enter your choice: ");
 }
@@ -54,7 +57,7 @@ void pdr_prompt() {
   printf("=================================================\n");
 }
 
-int getChoice() {
+int get_choice() {
   int choice;
   while (1) {
     scanf("%d", &choice);
@@ -69,7 +72,7 @@ int getChoice() {
 }
 
 // make more dynamic
-void infoHeader(char *message) {
+void info_header(char *message) {
   clear_console();
   gotoxy(4, 1, 36);
   printf("=================================================");
@@ -80,5 +83,19 @@ void infoHeader(char *message) {
   gotoxy(4, 7, 36);
   printf("---=            Enter [2] to save            =---");
   gotoxy(4, 9, 36);
+  printf("=================================================\n");
+}
+
+void pdr_admin() {
+  clear_console();
+  gotoxy(0, 2, 36);
+  printf("=================================================");
+  gotoxy(0, 4, 36);
+  printf("---=                 Hello                   =---");
+  gotoxy(0, 6, 36);
+  printf("---=     Please Enter your Admin Password    =---");
+  gotoxy(0, 8, 36);
+  printf("---=           Enter [Q/q] to quit           =---");
+  gotoxy(0, 10, 36);
   printf("=================================================\n");
 }

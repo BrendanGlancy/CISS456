@@ -39,7 +39,12 @@ int getChoice();
  *
  * @param message The message to be displayed in the header.
  */
-void infoHeader(char message[]);
+void info_header(char message[]);
+
+/**
+ * Displays a prompt for an admin db manager to login.
+ */
+void pdr_admin();
 
 #ifdef __cplusplus
 }
