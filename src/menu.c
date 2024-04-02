@@ -99,3 +99,17 @@ void pdr_admin() {
   gotoxy(0, 10, 36);
   printf("=================================================\n");
 }
+
+void table_viewer() {
+  clear_console();
+  gotoxy(0, 2, 36);
+  printf("=================================================");
+  gotoxy(0, 4, 36);
+  printf("---=               DB VIEWER                 =---");
+  gotoxy(0, 6, 36);
+  printf("---=       Examine the DB Configuration      =---");
+  gotoxy(0, 8, 36);
+  printf("---=          Enter [ENTER] to quit          =---");
+  gotoxy(0, 10, 36);
+  printf("=================================================\n");
+}

@@ -91,6 +91,7 @@ int main() {
         break;
       case 4:
         clear_console();
+        table_viewer();
         db_controller.view_tables();
         break;
       case 5:

@@ -45,6 +45,7 @@ void info_header(char message[]);
  * Displays a prompt for an admin db manager to login.
  */
 void pdr_admin();
+void table_viewer();
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,7 @@ ChinookDB::~ChinookDB() {
 
 bool ChinookDB::is_db_initialized() {
   const char *check_query =
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='STATES';";
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='Track';";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, check_query, -1, &stmt, nullptr) == SQLITE_OK) {
@@ -152,9 +152,35 @@ void ChinookDB::view_tables() {
 
   sqlite3_finalize(stmt);
 
-  std::cout << "Press 'Enter' to return to the menu." << std::endl;
+  std::cout << "Enter a table name to see its Contents: " << std::endl;
+  std::string table;
+  std::getline(std::cin, table);  // Read the user input for table name
+
+  // Construct SQL query to view contents of the specified table
+  std::string sql_table = "SELECT * FROM " + table + ";";
+
+  if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  // Execute the query and print the results
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    // Assuming the table has multiple columns, print each column's value
+    for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+      std::cout << sqlite3_column_text(stmt, i) << "\t";
+    }
+    std::cout << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+
+  std::cout << "Press <ENTER> To return to Main Menu" << std::endl;
   char input;
+
   do {
     input = getchar();  // Read the user input
-  } while (input != '\n');  // Wait until 'q' or 'Q' is pressed
+  } while (input != '\n');  // Wait until 'Enter' is pressed
 }
