@@ -5,7 +5,7 @@
 #include <sstream>
 
 ChinookDB::ChinookDB() : db(nullptr) {
-  int rc = sqlite3_open("./docs/chinook.db", &db);
+  int rc = sqlite3_open("./docs/chinook2.db", &db);
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
     return;  // Early return to avoid further operations if open fails
