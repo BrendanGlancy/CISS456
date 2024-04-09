@@ -5,7 +5,7 @@
 #include <sstream>
 
 ChinookDB::ChinookDB() : db(nullptr) {
-  int rc = sqlite3_open("./docs/chinook.db", &db);
+  int rc = sqlite3_open("./docs/pdr.db", &db);
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
     return; // Early return to avoid further operations if open fails
@@ -22,7 +22,7 @@ ChinookDB::~ChinookDB() {
 
 bool ChinookDB::is_db_initialized() {
   const char *check_query =
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='Track';";
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='ICD10S';";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, check_query, -1, &stmt, nullptr) == SQLITE_OK) {
@@ -39,7 +39,7 @@ void ChinookDB::initialize_database() {
   if (!is_db_initialized()) {
     execute_sql_file("./schema/schema.sql");
     execute_sql_file("./schema/data.sql");
-    execute_sql_file("./schema/chinook.sql");
+    execute_sql_file("./schema/A3_data.sql");
   }
 }
 

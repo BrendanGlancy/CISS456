@@ -12,7 +12,8 @@ std::string PDR::input_prompt(const std::string &prompt) {
   std::cout << prompt;
   std::string input;
   getline(std::cin, input);
-  if (input == "q" || input == "Q") throw UserQuitException();
+  if (input == "q" || input == "Q")
+    throw UserQuitException();
 
   return input;
 }
@@ -25,7 +26,8 @@ std::string PDR::get_input(const std::string &input) {
   while (true) {
     char choice = toupper(input_prompt(input)[0]);
 
-    if (choice == 'Q' && input.size() == 1) throw UserQuitException();
+    if (choice == 'Q' && input.size() == 1)
+      throw UserQuitException();
 
     return input;
 
@@ -110,9 +112,8 @@ std::string PDR::set_state() {
   do {
     input = input_prompt("State Code (EX: NY): ");
     std::transform(input.begin(), input.end(), input.begin(),
-                   ::toupper);  // Convert to upper case
-    if (!db.is_valid_state(
-            input)) {  // Use the db instance for state validation
+                   ::toupper);       // Convert to upper case
+    if (!db.is_valid_state(input)) { // Use the db instance for state validation
       std::cout << "Invalid State Code. Please try again." << std::endl;
     }
   } while (!db.is_valid_state(input));
@@ -132,53 +133,59 @@ std::string PDR::set_zip() {
 
 bool PDR::valid_ssn(const std::string &ssn) {
   // SSN must be 9 digits or 11 characters including dashes
-  if (ssn.length() != 9 && ssn.length() != 11) return false;
+  if (ssn.length() != 9 && ssn.length() != 11)
+    return false;
 
   for (size_t i = 0; i < ssn.length(); ++i) {
     if (i == 3 || i == 6) {
       if (ssn.length() == 11 && ssn[i] != '-')
-        return false;  // Dashes at correct positions
+        return false; // Dashes at correct positions
     } else {
       if (!isdigit(ssn[i]))
-        return false;  // Every other character must be a digit
+        return false; // Every other character must be a digit
     }
   }
   return true;
 }
 
 bool PDR::valid_name(const std::string &name) {
-  if (name.empty()) return false;
+  if (name.empty())
+    return false;
 
   for (char c : name) {
-    if (!isalpha(c) && c != '-' && c != '\'') return false;
+    if (!isalpha(c) && c != '-' && c != '\'')
+      return false;
   }
   return true;
 }
 
 bool PDR::valid_initial(const std::string &name) {
-  if (name.empty()) return false;
+  if (name.empty())
+    return false;
 
   for (char c : name) {
     // check if this is and alpha, and not - or '
-    if (!isalpha(c) && c != '-' && c != '\'' && name.size() > 1) return false;
+    if (!isalpha(c) && c != '-' && c != '\'' && name.size() > 1)
+      return false;
   }
   return true;
 }
 
 bool PDR::valid_state(const std::string &state) {
-  return db.is_valid_state(state);  // Delegate to ChinookDB instance
+  return db.is_valid_state(state); // Delegate to ChinookDB instance
 }
 
 bool PDR::valid_zip(const std::string &zip) {
-  if (zip.length() != 5 && zip.length() != 10) return false;
+  if (zip.length() != 5 && zip.length() != 10)
+    return false;
 
   for (size_t i = 0; i < zip.length(); ++i) {
     if (i == 5) {
       if (zip[i] != '-')
-        return false;  // If length is 10, position 6 must be a hyphen
+        return false; // If length is 10, position 6 must be a hyphen
     } else {
       if (!isdigit(zip[i]))
-        return false;  // Every other character must be a digit
+        return false; // Every other character must be a digit
     }
   }
   return true;
