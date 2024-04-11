@@ -22,7 +22,7 @@ ChinookDB::~ChinookDB() {
 
 bool ChinookDB::is_db_initialized() {
   const char *check_query =
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='ICD10S';";
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='PATIENTS';";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, check_query, -1, &stmt, nullptr) == SQLITE_OK) {

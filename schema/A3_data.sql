@@ -19,9 +19,10 @@ INSERT INTO ICD10S (Code, Description) VALUES
 
 -- Create PATIENTS table
 CREATE TABLE PATIENTS (
-    SSN INT PRIMARY KEY,
+    SSN INT,
     LastName VARCHAR(255),
-    Position VARCHAR(5)
+    Position VARCHAR(5),
+    LastServiceDate DATE
 );
 
 -- Insert data into PATIENTS
