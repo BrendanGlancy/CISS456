@@ -39,7 +39,6 @@ void ChinookDB::initialize_database() {
   if (!is_db_initialized()) {
     execute_sql_file("./schema/schema.sql");
     execute_sql_file("./schema/data.sql");
-    execute_sql_file("./schema/A3_data.sql");
   }
 }
 
