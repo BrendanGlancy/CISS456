@@ -19,6 +19,6 @@ CREATE TABLE IF NOT EXISTS PATIENTS (
     SSN INTEGER UNIQUE,
     LastName VARCHAR(255),
     Position VARCHAR(5),
-    LastServiceDate DATE,
+    LastServiceDate DATE DEFAULT CURRENT_DATE,
     StateCode CHAR(2) NOT NULL
 );

@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <iostream>
-#include <memory>  // For std::unique_ptr
+#include <memory> // For std::unique_ptr
 #include <sstream>
 #include <vector>
 
-#include "lib/header.h"           // Ensure this header is necessary or exists.
-#include "src/createchinook.hpp"  // Note the updated file name to match conventions.
+#include "lib/header.h"          // Ensure this header is necessary or exists.
+#include "src/createchinook.hpp" // Note the updated file name to match conventions.
 #include "src/menu.h"
 #include "src/pdr.hpp"
 
@@ -65,7 +65,7 @@ int main() {
   bool is_admin = false;
 
   std::vector<std::unique_ptr<PDR>> patient_info;
-  ChinookDB db_controller;  // Initializes the database upon construction.
+  ChinookDB db_controller; // Initializes the database upon construction.
 
   welcome();
 
@@ -76,32 +76,32 @@ int main() {
     int choice = get_choice();
 
     switch (choice) {
-      case 1:
-        collect_data(patient_info, db_controller, message);
-        break;
-      case 2:
-        store_data(patient_info, message);
-        break;
-      case 3:
-        is_admin = admin_mode(db_controller);
-        if (is_admin == true)
-          drop_tables();
-        else
-          std::cout << "You must be an admin to access this function";
-        break;
-      case 4:
-        clear_console();
-        table_viewer();
-        db_controller.view_tables();
-        break;
-      case 5:
-        clear_console();
-        reset_text_color();
-        running = false;
-        break;
-      default:
-        std::cout << "Invalid choice" << std::endl;
-        break;
+    case 1:
+      collect_data(patient_info, db_controller, message);
+      break;
+    case 2:
+      store_data(patient_info, message);
+      break;
+    case 3:
+      is_admin = admin_mode(db_controller);
+      if (is_admin == true)
+        drop_tables();
+      else
+        std::cout << "You must be an admin to access this function";
+      break;
+    case 4:
+      clear_console();
+      table_viewer();
+      db_controller.view_tables();
+      break;
+    case 5:
+      clear_console();
+      reset_text_color();
+      running = false;
+      break;
+    default:
+      std::cout << "Invalid choice" << std::endl;
+      break;
     }
   }
 
