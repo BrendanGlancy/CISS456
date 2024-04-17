@@ -1,6 +1,7 @@
 #include "createchinook.hpp"
 
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 
@@ -145,7 +146,9 @@ void ChinookDB::view_tables() {
   while (sqlite3_step(stmt) == SQLITE_ROW) {
     // Assuming the table has multiple columns, print each column's value
     for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
-      std::cout << sqlite3_column_text(stmt, i) << "\t";
+      const char *text =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+      std::cout << std::left << std::setw(11) << text;
     }
     std::cout << std::endl;
   }
