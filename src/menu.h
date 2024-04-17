@@ -19,20 +19,13 @@ void welcome();
  * Displays the main menu of the application.
  * This function lists the available options for the user to choose from.
  */
-void displayMenu();
+void display_menu();
 
 /**
  * Prompts the user to configure a car.
  * This function guides the user through the process of entering car details.
  */
 void pdr_prompt();
-
-/**
- * Retrieves the user's choice from the menu.
- *
- * @return The integer value representing the user's choice.
- */
-int getChoice();
 
 /**
  * Displays a header for informational messages.

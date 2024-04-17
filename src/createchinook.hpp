@@ -4,6 +4,8 @@
 
 #include <string>
 
+using std::string;
+
 class ChinookDB {
  public:
   ChinookDB();
@@ -15,6 +17,13 @@ class ChinookDB {
    * @returns bool
    */
   bool is_valid_state(const std::string& state_code);
+
+  /**
+   * Checks to see if a user exsists
+   * @param user_info
+   * @returns bool
+   */
+  bool match_user(const std::string& user_info);
 
   /**
    * Checks to see if the user is an admin, accorrding to the admin table

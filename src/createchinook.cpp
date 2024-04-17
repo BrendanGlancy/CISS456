@@ -9,7 +9,7 @@ ChinookDB::ChinookDB() : db(nullptr) {
   int rc = sqlite3_open("./docs/pdr.db", &db);
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
-    return; // Early return to avoid further operations if open fails
+    return;  // Early return to avoid further operations if open fails
   }
   initialize_database();
 }
@@ -17,7 +17,7 @@ ChinookDB::ChinookDB() : db(nullptr) {
 ChinookDB::~ChinookDB() {
   if (db) {
     sqlite3_close(db);
-    db = nullptr; // Good practice to nullify pointer after deletion
+    db = nullptr;  // Good practice to nullify pointer after deletion
   }
 }
 
@@ -29,11 +29,11 @@ bool ChinookDB::is_db_initialized() {
   if (sqlite3_prepare_v2(db, check_query, -1, &stmt, nullptr) == SQLITE_OK) {
     if (sqlite3_step(stmt) == SQLITE_ROW) {
       sqlite3_finalize(stmt);
-      return true; // The STATES table exists, indicating initialization has
+      return true;  // The STATES table exists, indicating initialization has
     }
     sqlite3_finalize(stmt);
   }
-  return false; // Initialization needed
+  return false;  // Initialization needed
 }
 
 void ChinookDB::initialize_database() {
@@ -49,21 +49,21 @@ void ChinookDB::execute_sql_file(const std::string &file_path) {
   // Check if the file was successfully opened. If not, log an error and exit
   if (!file.is_open()) {
     std::cerr << "Failed to open SQL file: " << file_path << std::endl;
-    return; // Early return to avoid further processing if the file cannot be
+    return;  // Early return to avoid further processing if the file cannot be
   }
 
   // Read the contents of the file into a string buffer.
   std::stringstream buffer;
-  buffer << file.rdbuf(); // Stream the file's content into the buffer.
-  std::string sql_commands = buffer.str(); // Convert the buffered stream to a
+  buffer << file.rdbuf();  // Stream the file's content into the buffer.
+  std::string sql_commands = buffer.str();  // Convert the buffered stream to a
 
   char *message_error = nullptr;
   if (sqlite3_exec(db, sql_commands.c_str(), nullptr, nullptr,
                    &message_error) != SQLITE_OK) {
     std::cerr << "Error executing SQL file (" << file_path
               << "): " << message_error << std::endl;
-    sqlite3_free(message_error); // Free the error message after logging to
-                                 // prevent memory leaks.
+    sqlite3_free(message_error);  // Free the error message after logging to
+                                  // prevent memory leaks.
   }
 }
 
@@ -74,19 +74,43 @@ bool ChinookDB::is_valid_state(const std::string &state_code) {
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
-    return false; // Indicates that state validation could not be performed due
-                  // to an error.
+    return false;  // Indicates that state validation could not be performed due
+                   // to an error.
   }
 
   sqlite3_bind_text(stmt, 1, state_code.c_str(), -1, SQLITE_STATIC);
 
   bool isValid =
       sqlite3_step(stmt) ==
-      SQLITE_ROW; // True if the state code is found, false otherwise.
+      SQLITE_ROW;  // True if the state code is found, false otherwise.
 
   sqlite3_finalize(stmt);
 
-  return isValid; // Return the validity of the state code based on query result
+  return isValid;  // Return the validity of the state code based on query
+                   // result
+}
+
+bool ChinookDB::match_user(const std::string &user_info) {
+  std::string sql = "SELECT * FROM states WHERE lname = ? or ssn = ?;";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return false;  // Indicates that state validation could not be performed due
+                   // to an error.
+  }
+
+  sqlite3_bind_text(stmt, 1, user_info.c_str(), -1, SQLITE_STATIC);
+
+  bool isValid =
+      sqlite3_step(stmt) ==
+      SQLITE_ROW;  // True if the state code is found, false otherwise.
+
+  sqlite3_finalize(stmt);
+
+  return isValid;  // Return the validity of the state code based on query
+                   // result
 }
 
 bool ChinookDB::is_user_admin(const std::string &user_id) {
@@ -97,14 +121,14 @@ bool ChinookDB::is_user_admin(const std::string &user_id) {
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
-    return false; // Statement preparation failed
+    return false;  // Statement preparation failed
   }
 
   sqlite3_bind_text(stmt, 1, user_id.c_str(), -1, SQLITE_STATIC);
 
   if (sqlite3_step(stmt) == SQLITE_ROW) {
     is_admin = sqlite3_column_int(stmt, 0) !=
-               0; // Assuming is_admin is stored as an integer (0 or 1)
+               0;  // Assuming is_admin is stored as an integer (0 or 1)
   }
 
   sqlite3_finalize(stmt);
@@ -130,7 +154,7 @@ void ChinookDB::view_tables() {
 
   std::cout << "Enter a table name to see its Contents: " << std::endl;
   std::string table;
-  std::getline(std::cin, table); // Read the user input for table name
+  std::getline(std::cin, table);  // Read the user input for table name
 
   // Construct SQL query to view contents of the specified table
   std::string sql_table = "SELECT * FROM " + table + ";";
@@ -159,6 +183,6 @@ void ChinookDB::view_tables() {
   char input;
 
   do {
-    input = getchar();     // Read the user input
-  } while (input != '\n'); // Wait until 'Enter' is pressed
+    input = getchar();  // Read the user input
+  } while (input != '\n');  // Wait until 'Enter' is pressed
 }
