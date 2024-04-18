@@ -1,6 +1,6 @@
 #include "pdr.hpp"
 
-#include <cctype>
+#include <regex>
 
 /**
  * Seperate function to display the prompt for an input
@@ -38,95 +38,31 @@ string PDR::get_input(const string &input) {
  * if we need input validation, we call a seperate input validation function the
  * check
  */
-string PDR::set_fname() {
+string PDR::set_icd_code() {
   string input;
   do {
-    input = input_prompt("First Name: ");
-    if (!valid_name(input)) {
-      std::cout << "Invalid first name. Please try again." << std::endl;
-    }
-  } while (!valid_name(input));
-  return input;
-}
-
-string PDR::set_minitial() {
-  string input;
-  do {
-    input = input_prompt("Middle Initial: ");
-    if (!valid_name(input)) {
-      std::cout << "Invalid middle initial. Please try again." << std::endl;
-    }
-  } while (!valid_name(input));
-  return input;
-}
-
-string PDR::set_lname() {
-  string input;
-  do {
-    input = input_prompt("Last Name: ");
-    if (!valid_name(input)) {
-      std::cout << "Invalid last name. Please try again." << std::endl;
-    }
-  } while (!valid_name(input));
-  return input;
-}
-
-string PDR::set_ssn() {
-  string input;
-  do {
-    input = input_prompt("Social Security Number: ");
-    if (!valid_ssn(input)) {
-      std::cout << "Invalid SSN. Please try again." << std::endl;
+    input = input_prompt("ICD-10 Code: ");
+    if (!db.is_valid_icd_code(input)) {
+      std::cout << "Invalid ICD-10 Code. Please try again." << std::endl;
     }
   } while (!valid_ssn(input));
   return input;
 }
 
-string PDR::set_address() {
+string PDR::set_injury_date() {
+  // TODO, add an option to select the current date or enter manually
   string input;
   do {
-    input = input_prompt("Address: ");
-    if (input.size() < 5) {
-      std::cout << "Invalid Address. Please try again." << std::endl;
+    input = input_prompt("Injury Date (YYYY-MM-DD): ");
+    if (!valid_date(input)) {
+      std::cout << "Invalid ICD-10 Code. Please try again." << std::endl;
     }
-  } while (input.size() < 5);
+  } while (!valid_ssn(input));
   return input;
 }
 
-string PDR::set_city() {
-  string input;
-  do {
-    input = input_prompt("City: ");
-    if (input.size() < 3) {
-      std::cout << "Invalid City. Please try again." << std::endl;
-    }
-  } while (input.size() < 3);
-  return input;
-}
-
-string PDR::set_state() {
-  string input;
-  do {
-    input = input_prompt("State Code (EX: NY): ");
-    std::transform(input.begin(), input.end(), input.begin(),
-                   ::toupper);  // Convert to upper case
-    if (!db.is_valid_state(
-            input)) {  // Use the db instance for state validation
-      std::cout << "Invalid State Code. Please try again." << std::endl;
-    }
-  } while (!db.is_valid_state(input));
-  return input;
-}
-
-string PDR::set_zip() {
-  string input;
-  do {
-    input = input_prompt("Zip Code: ");
-    if (!valid_zip(input)) {
-      std::cout << "Invalid State Code. Please try again." << std::endl;
-    }
-  } while (!valid_zip(input));
-  return input;
+string PDR::set_description() {
+  return input_prompt("Description of Injury: ");
 }
 
 bool PDR::lname_ssn() {
@@ -160,25 +96,6 @@ bool PDR::valid_ssn(const string &ssn) {
   return true;
 }
 
-bool PDR::valid_name(const string &name) {
-  if (name.empty()) return false;
-
-  for (char c : name) {
-    if (!isalpha(c) && c != '-' && c != '\'') return false;
-  }
-  return true;
-}
-
-bool PDR::valid_initial(const string &name) {
-  if (name.empty()) return false;
-
-  for (char c : name) {
-    // check if this is and alpha, and not - or '
-    if (!isalpha(c) && c != '-' && c != '\'' && name.size() > 1) return false;
-  }
-  return true;
-}
-
 bool PDR::valid_state(const string &state) {
   return db.is_valid_state(state);  // Delegate to ChinookDB instance
 }
@@ -189,29 +106,30 @@ bool PDR::match_lname(const string &last_name) {
 
 bool PDR::match_ssn(const string &ssn) { return db.match_user(ssn); }
 
-bool PDR::valid_zip(const string &zip) {
-  if (zip.length() != 5 && zip.length() != 10) return false;
-
-  for (size_t i = 0; i < zip.length(); ++i) {
-    if (i == 5) {
-      if (zip[i] != '-')
-        return false;  // If length is 10, position 6 must be a hyphen
-    } else {
-      if (!isdigit(zip[i]))
-        return false;  // Every other character must be a digit
-    }
-  }
-  return true;
+bool PDR::valid_date(const string &date) {
+  return regex_match(date, std::regex("\\d{4}-\\d{2}-\\d{2}"));
 }
 
-void PDR::collect_data() {
+void PDR::update_or_add_injury() {
+  // needs refactored to many nest
   try {
+    // Check if updating by last name or SSN
     if (lname_ssn()) {
-      patient.last_name = set_lname();
-      match_lname(patient.last_name);
-    } else {
-      patient.ssn = set_ssn();
-      match_ssn(patient.last_name);
+      if (!match_lname(patient.last_name)) {
+        std::cout << "No matching records found. Would you like to add a new "
+                     "record? [Y/N]"
+                  << std::endl;
+        if (toupper(input_prompt("Choice: ")[0]) == 'Y') {
+          // pass
+        }
+      } else {
+        // pass
+      }
+    }
+  } catch (const UserQuitException &e) {
+    std::cerr << "User chose to quit: " << e.what() << std::endl;
+    if (Menu_Callback) {
+      Menu_Callback();
     }
   } catch (const std::exception &e) {
     std::cerr << "An error occurred: " << e.what() << std::endl;

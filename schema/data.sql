@@ -90,3 +90,30 @@ INSERT INTO PATIENTS (SSN, LastName, Position, StateCode) VALUES
 (000000024, 'ELLIS', 'SS', 'OH'),
 (000000009, 'BAHR', 'K', 'OH'),
 (000000011, 'JOHNSON', 'P', 'OH');
+
+-- Insert injuries for players
+INSERT INTO INJURIES (PatientSSN, ICD10Code, InjuryDate, Description) VALUES
+(000000019, 'S02', '1985-09-14', 'Minor fracture of skull during a game collision.'),
+(000000044, 'S72', '1985-10-07', 'Fracture of femur during a tackle.'),
+(000000034, 'S22', '1985-11-01', 'Rib fracture from a heavy fall.'),
+(000000084, 'S52', '1985-09-21', 'Forearm fracture after a fall.'),
+(000000088, 'S62', '1985-12-05', 'Wrist fracture during practice.'),
+(000000092, 'S82', '1985-11-15', 'Ankle fracture during a game.'),
+(000000087, 'S32', '1985-10-22', 'Fracture of the lumbar spine from an awkward tackle.'),
+(000000061, 'S42', '1985-09-30', 'Shoulder fracture during a blocking incident.'),
+(000000077, 'S92', '1985-11-20', 'Fracture of the foot during a sprint.'),
+(000000063, 'S62', '1985-10-13', 'Hand fracture after hitting a helmet.'),
+(000000069, 'S12', '1985-12-10', 'Neck fracture from a collision.'),
+(000000070, 'S22', '1985-08-17', 'Sternum fracture during a preseason game.'),
+(000000096, 'S32', '1985-09-05', 'Pelvic fracture during a training session.'),
+(000000079, 'S72', '1985-11-29', 'Femur fracture from a sideline collision.'),
+(000000090, 'S22', '1985-10-28', 'Thoracic spine fracture during a pileup.'),
+(000000078, 'S52', '1985-11-08', 'Forearm fracture from defending a pass.'),
+(000000056, 'S62', '1985-12-22', 'Wrist fracture during the final game of the season.'),
+(000000057, 'S82', '1985-09-19', 'Lower leg fracture from a kickoff return.'),
+(000000029, 'S42', '1985-11-03', 'Upper arm fracture from a diving tackle.'),
+(000000031, 'S52', '1985-10-12', 'Forearm fracture during a scuffle.'),
+(000000022, 'S72', '1985-11-25', 'Femur fracture during a blitz.'),
+(000000024, 'S92', '1985-09-08', 'Toe fracture from a misstep.'),
+(000000009, 'S42', '1985-10-05', 'Shoulder fracture from a field goal block.'),
+(000000011, 'S22', '1985-11-18', 'Rib fracture during a punt.');

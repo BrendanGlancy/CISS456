@@ -6,64 +6,76 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <regex>  // Include for regex functionality
 #include <sstream>
 #include <string>
 
 #include "../lib/Exceptions.hpp"
 #include "../lib/header.h"
-#include "createchinook.hpp"  // Include the path to the ChinookDB header
+#include "db_controller.hpp"  // Path to the database manager class
+
+using std::function;
+using std::string;
 
 struct PatientRecord {
-  std::string ssn, first_name, middle_initial, last_name, address, city,
-      state_code, zip;
+  string ssn, first_name, middle_initial, last_name, address, city, state_code,
+      zip;
   bool valid;
 };
 
 class PDR {
  public:
-  PDR(ChinookDB &db)
-      : db(db) {}  // Add a constructor to accept a ChinookDB reference
-  using Callback = std::function<void()>;
+  explicit PDR(DB_Manager& db)
+      : db(db) {}  // Constructor with a DB_Manager reference
+
+  using Callback = function<void()>;
+
+  /**
+   * Collects data for updating or adding a patient's injury record.
+   */
   void collect_data();
 
   /**
-   * Sets a callback function for the menu.
+   * Sets a callback function to return to the main menu.
    *
-   * @param callback The function to be called for the menu.
+   * @param callback The function to be called for returning to the menu.
    */
   void set_menu_callback(Callback callback);
 
+  /**
+   * Initiates the process to update or add an injury record for a patient.
+   */
+  void update_or_add_injury();
+
  private:
-  PatientRecord patient;                // Holds the current patient's data
-  std::function<void()> Menu_Callback;  // Callback for returning to the menu
-  ChinookDB &db;  // Reference to the database for state validation
+  PatientRecord patient;   // Holds the current patient's data
+  Callback Menu_Callback;  // Callback for returning to the menu
+  DB_Manager& db;          // Reference to the database manager
 
   // Input and validation methods
-  bool valid_ssn(const std::string &ssn);
-  bool valid_name(const std::string &name);
-  bool valid_initial(const std::string &name);
-  bool valid_state(
-      const std::string &state);  // This will now interact with the database
-  bool valid_zip(const std::string &zip);
-  bool match_lname(const std::string &last_name);
-  bool match_ssn(const std::string &ssn);
+  bool valid_ssn(const string& ssn);
+  bool valid_state(const string& state);  // Validates state using the database
+  bool match_lname(const string& last_name);
+  bool match_ssn(const string& ssn);
   bool lname_ssn();
+  bool valid_date(const string& date);  // Validates the format of a date
+
+  // Methods for updating and adding injury records
+  void update_injury_record();
+  void add_injury_record(const string& identifier);
+  string set_icd_code();
+  string set_injury_date();
+  string set_description();
 
   // Utility methods for getting and validating user input
-  std::string get_valid_input(
-      const std::string &prompt,
-      const std::function<bool(const std::string &)> &validator);
-  std::string input_prompt(const std::string &prompt);
+  string get_valid_input(const string& prompt,
+                         const function<bool(const string&)>& validator);
+  string input_prompt(const string& prompt);
 
-  std::string set_fname();
-  std::string set_minitial();
-  std::string set_lname();
-  std::string set_address();
-  std::string set_city();
-  std::string set_state();  // State input that will validate using the database
-  std::string set_zip();
-  std::string set_ssn();
+  // Methods to set individual attributes of a patient
+  string set_lname();
+  string set_ssn();
 
   // Helper method to process user input
-  std::string get_input(const std::string &input);
+  string get_input(const string& input);
 };

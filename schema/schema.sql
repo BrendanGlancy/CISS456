@@ -22,3 +22,14 @@ CREATE TABLE IF NOT EXISTS PATIENTS (
     LastServiceDate DATE DEFAULT CURRENT_DATE,
     StateCode CHAR(2) NOT NULL
 );
+
+-- Create a new INJURIES table
+CREATE TABLE IF NOT EXISTS INJURIES (
+    InjuryID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PatientSSN INTEGER NOT NULL,
+    ICD10Code VARCHAR(7) NOT NULL,  -- Adjusted to accommodate typical ICD-10 codes (up to 7 characters)
+    InjuryDate DATE NOT NULL,
+    Description TEXT,
+    FOREIGN KEY (PatientSSN) REFERENCES PATIENTS(SSN),
+    FOREIGN KEY (ICD10Code) REFERENCES ICD10S(Code)
+);

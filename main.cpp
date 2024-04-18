@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "lib/header.h"           // Ensure this header is necessary or exists.
-#include "src/createchinook.hpp"  // Note the updated file name to match conventions.
+#include "src/db_controller.hpp"  // Note the updated file name to match conventions.
 #include "src/menu.h"
 #include "src/pdr.hpp"
 
@@ -14,7 +14,7 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-void collect_data(vector<unique_ptr<PDR>> &patient_info, ChinookDB &db,
+void collect_data(vector<unique_ptr<PDR>> &patient_info, DB_Manager &db,
                   char *message) {
   patient_info.push_back(make_unique<PDR>(db));
   snprintf(message, sizeof("   Data save success   "),
@@ -22,19 +22,11 @@ void collect_data(vector<unique_ptr<PDR>> &patient_info, ChinookDB &db,
   clear_console();
   // Assuming pdr_prompt is a global function that's available
   pdr_prompt();
-  patient_info.back()->collect_data();
+  patient_info.back()->update_or_add_injury();
 }
 
 void store_data(const vector<unique_ptr<PDR>> &patients, char *message) {
   std::cout << "Not Implemented" << std::endl;
-}
-
-bool admin_mode(ChinookDB db_controller) {
-  // Example user ID. You would get this from the user session or input
-  string user_id = "example_user_id";
-
-  // Check if the user is an admin
-  return db_controller.is_user_admin(user_id);
 }
 
 int get_choice() {
@@ -59,7 +51,7 @@ int main() {
   bool running = true;
 
   vector<unique_ptr<PDR>> patient_info;
-  ChinookDB db_controller;  // Initializes the database upon construction.
+  DB_Manager db_controller;  // Initializes the database upon construction.
 
   welcome();
 
