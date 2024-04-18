@@ -192,3 +192,30 @@ void DB_Manager::view_tables() {
     input = getchar();
   } while (input != '\n');
 }
+
+void DB_Manager::view_patients() {
+  string sql_table = "SELECT * FROM PATIENTS;";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  // Execute the query and print the results
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    // Assuming the table has multiple columns, print each column's value
+    for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+      const char *text =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+      // sets the max length of each row to 11 (9 ssn + 2)
+      // pretty prints since we are setting the width of each row to be the same
+      std::cout << std::left << std::setw(11) << text;
+    }
+    std::cout << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}

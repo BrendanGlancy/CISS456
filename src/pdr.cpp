@@ -104,6 +104,7 @@ string PDR::set_state() {
 
 // this could return the patient info
 optional<PatientRecord> PDR::lname_ssn() {
+  db.view_patients();
   while (true) {
     string input = input_prompt("Find Patient by Last Name or SSN [L/s]: ");
     if (!input.empty()) {
@@ -152,7 +153,12 @@ bool PDR::valid_state(const string &state) {
 }
 
 optional<PatientRecord> PDR::match_lname(const string &last_name) {
-  return db.match_user(last_name);
+  string modified_name = last_name;
+  std::transform(modified_name.begin(), modified_name.end(),
+                 modified_name.begin(),
+                 [](unsigned char c) { return std::toupper(c); });
+
+  return db.match_user(modified_name);
 }
 
 optional<PatientRecord> PDR::match_ssn(const string &ssn) {

@@ -12,6 +12,13 @@
 using std::optional;
 using std::string;
 
+/**
+ * SSN INTEGER UNIQUE,
+ * LastName VARCHAR(255),
+ * Position VARCHAR(5),
+ * LastServiceDate DATE DEFAULT CURRENT_DATE,
+ * StateCode CHAR(2) NOT NULL
+ */
 struct PatientRecord {
   string ssn, last_name, position, service_date, state_code;
   bool valid;
@@ -47,6 +54,11 @@ public:
    * Prints all tables to the console
    */
   void view_tables();
+
+  /**
+   * Prints patients from the db
+   */
+  void view_patients();
 
   /**
    * Allows for the user to add an injury to the injury table

@@ -18,12 +18,24 @@ using std::function;
 using std::string;
 
 /**
- * SSN INTEGER UNIQUE,
- * LastName VARCHAR(255),
- * Position VARCHAR(5),
- * LastServiceDate DATE DEFAULT CURRENT_DATE,
- * StateCode CHAR(2) NOT NULL
+ *  InjuryID INTEGER PRIMARY KEY AUTOINCREMENT,
+ *  PatientSSN INTEGER NOT NULL,
+ *  ICD10Code VARCHAR(7) NOT NULL,
+ *  InjuryDate DATE NOT NULL,
+ *  Description TEXT,
+ *  FOREIGN KEY (PatientSSN) REFERENCES PATIENTS(SSN),
+ *  FOREIGN KEY (ICD10Code) REFERENCES ICD10S(Code)
  */
+struct Injury {
+  int injury_id;
+  string patient_ssn;
+  string icd10_code;
+  string injury_date;
+  string description;
+  bool valid;
+
+  Injury() : injury_id(0), valid(false) {} // Default constructor
+};
 
 class PDR {
 public:
