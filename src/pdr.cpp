@@ -65,7 +65,44 @@ string PDR::set_description() {
   return input_prompt("Description of Injury: ");
 }
 
-bool PDR::lname_ssn() {
+string PDR::set_lname() {
+  string input;
+  do {
+    input = input_prompt("Last Name: ");
+    if (!valid_name(input)) {
+      std::cout << "Invalid last name. Please try again." << std::endl;
+    }
+  } while (!valid_name(input));
+  return input;
+}
+
+string PDR::set_ssn() {
+  string input;
+  do {
+    input = input_prompt("Social Security Number: ");
+    if (!valid_ssn(input)) {
+      std::cout << "Invalid SSN. Please try again." << std::endl;
+    }
+  } while (!valid_ssn(input));
+  return input;
+}
+
+string PDR::set_state() {
+  string input;
+  do {
+    input = input_prompt("State Code (EX: NY): ");
+    std::transform(input.begin(), input.end(), input.begin(),
+                   ::toupper);  // Convert to upper case
+    if (!db.is_valid_state(
+            input)) {  // Use the db instance for state validation
+      std::cout << "Invalid State Code. Please try again." << std::endl;
+    }
+  } while (!db.is_valid_state(input));
+  return input;
+}
+
+// this could return the patient info
+PatientRecord PDR::lname_ssn() {
   string input;
   do {
     input = input_prompt("Find User By Last Name or SSN [L/s]");
@@ -74,10 +111,16 @@ bool PDR::lname_ssn() {
           std::toupper(input[0]);  // Convert the first character to upper case
     }
     if (input == "L") {
-      return true;
+      // should be using set_lname
+      string last_name = input_prompt("Enter the Last Name of the user: ");
+      match_lname(last_name);
     }
+    // should be using set_ssn
+    string ssn = input_prompt("Enter the SSN of the user: ");
+    match_ssn(ssn);
   } while (input != "S" || input != "L");
-  return false;
+
+  return PatientRecord();
 }
 
 bool PDR::valid_ssn(const string &ssn) {
@@ -92,6 +135,15 @@ bool PDR::valid_ssn(const string &ssn) {
       if (!isdigit(ssn[i]))
         return false;  // Every other character must be a digit
     }
+  }
+  return true;
+}
+
+bool PDR::valid_name(const string &name) {
+  if (name.empty()) return false;
+
+  for (char c : name) {
+    if (!isalpha(c) && c != '-' && c != '\'') return false;
   }
   return true;
 }
@@ -111,21 +163,9 @@ bool PDR::valid_date(const string &date) {
 }
 
 void PDR::update_or_add_injury() {
-  // needs refactored to many nest
   try {
-    // Check if updating by last name or SSN
-    if (lname_ssn()) {
-      if (!match_lname(patient.last_name)) {
-        std::cout << "No matching records found. Would you like to add a new "
-                     "record? [Y/N]"
-                  << std::endl;
-        if (toupper(input_prompt("Choice: ")[0]) == 'Y') {
-          // pass
-        }
-      } else {
-        // pass
-      }
-    }
+    PatientRecord curr_patient = lname_ssn();
+    // we then update the curr_patient
   } catch (const UserQuitException &e) {
     std::cerr << "User chose to quit: " << e.what() << std::endl;
     if (Menu_Callback) {

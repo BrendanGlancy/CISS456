@@ -55,9 +55,10 @@ class PDR {
   // Input and validation methods
   bool valid_ssn(const string& ssn);
   bool valid_state(const string& state);  // Validates state using the database
+  bool valid_name(const string& name);    // Validates state using the database
   bool match_lname(const string& last_name);
   bool match_ssn(const string& ssn);
-  bool lname_ssn();
+  PatientRecord lname_ssn();
   bool valid_date(const string& date);  // Validates the format of a date
 
   // Methods for updating and adding injury records
@@ -75,6 +76,7 @@ class PDR {
   // Methods to set individual attributes of a patient
   string set_lname();
   string set_ssn();
+  string set_state();
 
   // Helper method to process user input
   string get_input(const string& input);
