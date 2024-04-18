@@ -1,6 +1,6 @@
 #include "pdr.hpp"
-
-#include <regex>
+#include "db_controller.hpp"
+#include <cctype>
 
 /**
  * Seperate function to display the prompt for an input
@@ -11,7 +11,8 @@ string PDR::input_prompt(const string &prompt) {
   std::cout << prompt;
   string input;
   getline(std::cin, input);
-  if (input == "q" || input == "Q") throw UserQuitException();
+  if (input == "q" || input == "Q")
+    throw UserQuitException();
 
   return input;
 }
@@ -24,7 +25,8 @@ string PDR::get_input(const string &input) {
   while (true) {
     char choice = toupper(input_prompt(input)[0]);
 
-    if (choice == 'Q' && input.size() == 1) throw UserQuitException();
+    if (choice == 'Q' && input.size() == 1)
+      throw UserQuitException();
 
     return input;
 
@@ -92,9 +94,8 @@ string PDR::set_state() {
   do {
     input = input_prompt("State Code (EX: NY): ");
     std::transform(input.begin(), input.end(), input.begin(),
-                   ::toupper);  // Convert to upper case
-    if (!db.is_valid_state(
-            input)) {  // Use the db instance for state validation
+                   ::toupper);       // Convert to upper case
+    if (!db.is_valid_state(input)) { // Use the db instance for state validation
       std::cout << "Invalid State Code. Please try again." << std::endl;
     }
   } while (!db.is_valid_state(input));
@@ -102,61 +103,61 @@ string PDR::set_state() {
 }
 
 // this could return the patient info
-PatientRecord PDR::lname_ssn() {
-  string input;
-  do {
-    input = input_prompt("Find User By Last Name or SSN [L/s]");
+optional<PatientRecord> PDR::lname_ssn() {
+  while (true) {
+    string input = input_prompt("Find Patient by Last Name or SSN [L/s]: ");
     if (!input.empty()) {
-      input[0] =
-          std::toupper(input[0]);  // Convert the first character to upper case
+      char choice = toupper(input[0]);
+      if (choice == 'L') {
+        string lname = set_lname();
+        return match_lname(lname);
+      } else if (choice == 'S') {
+        string ssn = set_ssn();
+        return match_ssn(ssn);
+      }
     }
-    if (input == "L") {
-      // should be using set_lname
-      string last_name = input_prompt("Enter the Last Name of the user: ");
-      match_lname(last_name);
-    }
-    // should be using set_ssn
-    string ssn = input_prompt("Enter the SSN of the user: ");
-    match_ssn(ssn);
-  } while (input != "S" || input != "L");
-
-  return PatientRecord();
+  }
 }
 
 bool PDR::valid_ssn(const string &ssn) {
   // SSN must be 9 digits or 11 characters including dashes
-  if (ssn.length() != 9 && ssn.length() != 11) return false;
+  if (ssn.length() != 9 && ssn.length() != 11)
+    return false;
 
   for (size_t i = 0; i < ssn.length(); ++i) {
     if (i == 3 || i == 6) {
       if (ssn.length() == 11 && ssn[i] != '-')
-        return false;  // Dashes at correct positions
+        return false; // Dashes at correct positions
     } else {
       if (!isdigit(ssn[i]))
-        return false;  // Every other character must be a digit
+        return false; // Every other character must be a digit
     }
   }
   return true;
 }
 
 bool PDR::valid_name(const string &name) {
-  if (name.empty()) return false;
+  if (name.empty())
+    return false;
 
   for (char c : name) {
-    if (!isalpha(c) && c != '-' && c != '\'') return false;
+    if (!isalpha(c) && c != '-' && c != '\'')
+      return false;
   }
   return true;
 }
 
 bool PDR::valid_state(const string &state) {
-  return db.is_valid_state(state);  // Delegate to ChinookDB instance
+  return db.is_valid_state(state); // Delegate to ChinookDB instance
 }
 
-bool PDR::match_lname(const string &last_name) {
+optional<PatientRecord> PDR::match_lname(const string &last_name) {
   return db.match_user(last_name);
 }
 
-bool PDR::match_ssn(const string &ssn) { return db.match_user(ssn); }
+optional<PatientRecord> PDR::match_ssn(const string &ssn) {
+  return db.match_user(ssn);
+}
 
 bool PDR::valid_date(const string &date) {
   return regex_match(date, std::regex("\\d{4}-\\d{2}-\\d{2}"));
@@ -164,8 +165,34 @@ bool PDR::valid_date(const string &date) {
 
 void PDR::update_or_add_injury() {
   try {
-    PatientRecord curr_patient = lname_ssn();
-    // we then update the curr_patient
+    // Attempt to find a patient by last name or SSN.
+    std::optional<PatientRecord> curr_patient = lname_ssn();
+    if (curr_patient) {
+      // If a patient record is found, display the patient's details.
+      std::cout << "Patient found: " << std::endl;
+      std::cout << "SSN: " << curr_patient->ssn << std::endl;
+      std::cout << "Last Name: " << curr_patient->last_name << std::endl;
+      std::cout << "Position: " << curr_patient->position << std::endl;
+      std::cout << "Last Service Date: " << curr_patient->service_date
+                << std::endl;
+      std::cout << "State Code: " << curr_patient->state_code << std::endl;
+
+      // Optionally, update or add an injury entry.
+      std::string icd_code = set_icd_code();
+      std::string injury_date = set_injury_date();
+      std::string description = set_description();
+
+    } else {
+      std::cout << "No patient found. Please try again or add a new patient."
+                << std::endl;
+
+      std::cout << "Press <ENTER> To return to Main Menu" << std::endl;
+      char input;
+
+      do {
+        input = getchar();
+      } while (input != '\n');
+    }
   } catch (const UserQuitException &e) {
     std::cerr << "User chose to quit: " << e.what() << std::endl;
     if (Menu_Callback) {
@@ -178,3 +205,5 @@ void PDR::update_or_add_injury() {
     }
   }
 }
+
+PDR::~PDR() {}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <sqlite3.h>
 
 #include <fstream>
@@ -8,10 +9,16 @@
 #include <sstream>
 #include <string>
 
+using std::optional;
 using std::string;
 
+struct PatientRecord {
+  string ssn, last_name, position, service_date, state_code;
+  bool valid;
+};
+
 class DB_Manager {
- public:
+public:
   DB_Manager();
   ~DB_Manager();
 
@@ -20,21 +27,21 @@ class DB_Manager {
    * @param state_code
    * @returns bool
    */
-  bool is_valid_state(const std::string& state_code);
+  bool is_valid_state(const std::string &state_code);
 
   /**
    * Checks to see if a state code is valid
    * @param state_code
    * @returns bool
    */
-  bool is_valid_icd_code(const std::string& icd_code);
+  bool is_valid_icd_code(const std::string &icd_code);
 
   /**
    * Checks to see if a user exsists
    * @param user_info
    * @returns bool
    */
-  bool match_user(const std::string& user_info);
+  optional<PatientRecord> match_user(const std::string &user_info);
 
   /**
    * Prints all tables to the console
@@ -46,9 +53,9 @@ class DB_Manager {
    */
   void injury_controller();
 
- private:
-  sqlite3* db;
-  void execute_sql_file(const std::string& file_path);
+private:
+  sqlite3 *db;
+  void execute_sql_file(const std::string &file_path);
   void initialize_database();
   bool is_db_initialized();
 };

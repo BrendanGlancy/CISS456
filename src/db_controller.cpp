@@ -4,7 +4,7 @@ DB_Manager::DB_Manager() : db(nullptr) {
   int rc = sqlite3_open("./docs/pdr.db", &db);
   if (rc) {
     std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
-    return;  // Early return to avoid further operations if open fails
+    return; // Early return to avoid further operations if open fails
   }
   initialize_database();
 }
@@ -12,7 +12,7 @@ DB_Manager::DB_Manager() : db(nullptr) {
 DB_Manager::~DB_Manager() {
   if (db) {
     sqlite3_close(db);
-    db = nullptr;  // Good practice to nullify pointer after deletion
+    db = nullptr; // Good practice to nullify pointer after deletion
   }
 }
 
@@ -57,7 +57,7 @@ void DB_Manager::execute_sql_file(const std::string &file_path) {
                    &message_error) != SQLITE_OK) {
     std::cerr << "Error executing SQL file (" << file_path
               << "): " << message_error << std::endl;
-    sqlite3_free(message_error);  // Free the error message after logging to
+    sqlite3_free(message_error); // Free the error message after logging to
   }
 }
 
@@ -68,8 +68,8 @@ bool DB_Manager::is_valid_state(const std::string &state_code) {
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
-    return false;  // Indicates that state validation could not be performed due
-                   // to an error.
+    return false; // Indicates that state validation could not be performed due
+                  // to an error.
   }
 
   sqlite3_bind_text(stmt, 1, state_code.c_str(), -1, SQLITE_STATIC);
@@ -79,8 +79,8 @@ bool DB_Manager::is_valid_state(const std::string &state_code) {
 
   sqlite3_finalize(stmt);
 
-  return isValid;  // Return the validity of the state code based on query
-                   // result
+  return isValid; // Return the validity of the state code based on query
+                  // result
 }
 
 bool DB_Manager::is_valid_icd_code(const std::string &icd_code) {
@@ -102,24 +102,41 @@ bool DB_Manager::is_valid_icd_code(const std::string &icd_code) {
   return isValid;
 }
 
-bool DB_Manager::match_user(const std::string &user_info) {
-  std::string sql = "SELECT * FROM PATIENTS WHERE lname = ? or ssn = ?;";
+std::optional<PatientRecord>
+DB_Manager::match_user(const std::string &user_info) {
+  std::string sql = "SELECT SSN, LastName, Position, LastServiceDate, "
+                    "StateCode FROM PATIENTS WHERE LastName = ? OR SSN = ?;";
   sqlite3_stmt *stmt = nullptr;
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
-    return false;
+    return std::nullopt; // Return an empty optional if the statement
+                         // preparation fails
   }
 
   sqlite3_bind_text(stmt, 1, user_info.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, user_info.c_str(), -1, SQLITE_STATIC);
 
-  //
-  bool is_valid = sqlite3_step(stmt) == SQLITE_ROW;
+  PatientRecord record;
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    record.ssn = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+    record.last_name =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+    record.position =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
+    record.service_date =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
+    record.state_code =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+    record.valid = true;
+  } else {
+    record.valid = false; // Set valid to false if no record is found
+  }
 
   sqlite3_finalize(stmt);
-
-  return is_valid;
+  return record.valid ? std::optional<PatientRecord>(record) : std::nullopt;
 }
 
 void DB_Manager::view_tables() {
@@ -141,7 +158,7 @@ void DB_Manager::view_tables() {
 
   std::cout << "Enter a table name to see its Contents: " << std::endl;
   std::string table;
-  std::getline(std::cin, table);  // Read the user input for table name
+  std::getline(std::cin, table); // Read the user input for table name
 
   // Construct SQL query to view contents of the specified table
   std::string sql_table = "SELECT * FROM " + table + ";";
