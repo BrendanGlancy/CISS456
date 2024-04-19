@@ -1,57 +1,3 @@
-INSERT INTO STATES (CODE, NAME) VALUES
-('AL', 'Alabama'),
-('AK', 'Alaska'),
-('AZ', 'Arizona'),
-('AR', 'Arkansas'),
-('CA', 'California'),
-('CO', 'Colorado'),
-('CT', 'Connecticut'),
-('DE', 'Delaware'),
-('FL', 'Florida'),
-('GA', 'Georgia'),
-('HI', 'Hawaii'),
-('ID', 'Idaho'),
-('IL', 'Illinois'),
-('IN', 'Indiana'),
-('IA', 'Iowa'),
-('KS', 'Kansas'),
-('KY', 'Kentucky'),
-('LA', 'Louisiana'),
-('ME', 'Maine'),
-('MD', 'Maryland'),
-('MA', 'Massachusetts'),
-('MI', 'Michigan'),
-('MN', 'Minnesota'),
-('MS', 'Mississippi'),
-('MO', 'Missouri'),
-('MT', 'Montana'),
-('NE', 'Nebraska'),
-('NV', 'Nevada'),
-('NH', 'New Hampshire'),
-('NJ', 'New Jersey'),
-('NM', 'New Mexico'),
-('NY', 'New York'),
-('NC', 'North Carolina'),
-('ND', 'North Dakota'),
-('OH', 'Ohio'),
-('OK', 'Oklahoma'),
-('OR', 'Oregon'),
-('PA', 'Pennsylvania'),
-('RI', 'Rhode Island'),
-('SC', 'South Carolina'),
-('SD', 'South Dakota'),
-('TN', 'Tennessee'),
-('TX', 'Texas'),
-('UT', 'Utah'),
-('VT', 'Vermont'),
-('VA', 'Virginia'),
-('WA', 'Washington'),
-('WV', 'West Virginia'),
-('WI', 'Wisconsin'),
-('WY', 'Wyoming')
-ON CONFLICT(CODE) DO NOTHING;
-
-
 INSERT INTO ICD10S (Code, Description) VALUES
 ('S02', 'Fracture of skull and facial bones'),
 ('S12', 'Fracture of neck'),
@@ -92,5 +38,5 @@ INSERT INTO PATIENTS (SSN, LastName, Position, StateCode) VALUES
 (000000011, 'JOHNSON', 'P', 'OH');
 
 -- Insert injuries for players
-INSERT INTO INJURIES (PatientSSN, ICD10Code, InjuryDate, Description) VALUES
+INSERT INTO ENCOUNTERS (PatientSSN, ICD10Code, InjuryDate, Description) VALUES
 (000000019, 'S02', '1985-09-14', 'Minor fracture of skull during a game collision.'),

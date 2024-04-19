@@ -28,11 +28,17 @@ void display_menu();
 void pdr_prompt();
 
 /**
+ * Prompts the user to configure a car.
+ * This function guides the user through the process of entering car details.
+ */
+void injury_prompt();
+
+/**
  * Displays a header for informational messages.
  *
  * @param message The message to be displayed in the header.
  */
-void info_header(char message[]);
+void info_header(char message[], int offseT);
 
 /**
  * Displays a prompt for an admin db manager to login.

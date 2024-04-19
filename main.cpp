@@ -11,15 +11,26 @@
 using std::istringstream;
 using std::string;
 
-void collect_data(PDR &patient_info, char *message) {
+void prompt_init(char *message) {
   clear_console();
-  // Assuming pdr_prompt is a global function that's available
-  pdr_prompt();
-  patient_info.update_or_add_injury();
+  info_header(message, 0);
 }
 
-void store_data(PDR &patient_info, char *message) {
-  std::cout << "Not Implemented" << std::endl;
+void collect_data(PDR &patient_info, char *message) {
+  prompt_init(message);
+  patient_info.update_encounter();
+}
+
+void patients(PDR &patient_info) {
+  char message[256] = " Welcome Patient Admin ";
+  prompt_init(message);
+  patient_info.edit_patients();
+}
+
+void ICD10S(PDR &patient_info) {
+  char message[256] = "  Welcome ICD10 Admin  ";
+  prompt_init(message);
+  patient_info.edit_ICD10S();
 }
 
 int get_choice() {
@@ -30,9 +41,8 @@ int get_choice() {
     getline(std::cin, input);
     istringstream stream(input);
 
-    if (stream >> choice && stream.eof()) {
+    if (stream >> choice && stream.eof())
       return choice;
-    }
 
     printf("Invalid Input, Try again: ");
   }
@@ -49,24 +59,34 @@ int main() {
   welcome();
 
   while (running) {
-    info_header(message);
+    info_header(message, 4);
     display_menu();
 
     int choice = get_choice();
 
     switch (choice) {
     case 1:
+      // New Encounter
       collect_data(patient_info, message);
       break;
     case 2:
-      store_data(patient_info, message);
+      patients(patient_info);
+      clear_console();
+      // table_viewer();
       break;
     case 3:
+      ICD10S(patient_info);
+      clear_console();
+      // table_viewer();
+      break;
+    case 4:
+      // View all Tables
       clear_console();
       table_viewer();
       db_controller.view_tables();
       break;
-    case 4:
+    case 5:
+      // Exit
       clear_console();
       reset_text_color();
       running = false;

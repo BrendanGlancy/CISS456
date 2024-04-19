@@ -13,29 +13,10 @@
 #include "../lib/Exceptions.hpp"
 #include "../lib/header.h"
 #include "db_controller.hpp" // Path to the database manager class
+#include "menu.h"
 
 using std::function;
 using std::string;
-
-/**
- *  InjuryID INTEGER PRIMARY KEY AUTOINCREMENT,
- *  PatientSSN INTEGER NOT NULL,
- *  ICD10Code VARCHAR(7) NOT NULL,
- *  InjuryDate DATE NOT NULL,
- *  Description TEXT,
- *  FOREIGN KEY (PatientSSN) REFERENCES PATIENTS(SSN),
- *  FOREIGN KEY (ICD10Code) REFERENCES ICD10S(Code)
- */
-struct Injury {
-  int injury_id;
-  string patient_ssn;
-  string icd10_code;
-  string injury_date;
-  string description;
-  bool valid;
-
-  Injury() : injury_id(0), valid(false) {} // Default constructor
-};
 
 class PDR {
 public:
@@ -59,7 +40,9 @@ public:
   /**
    * Initiates the process to update or add an injury record for a patient.
    */
-  void update_or_add_injury();
+  void update_encounter();
+  void edit_patients();
+  void edit_ICD10S();
 
 private:
   PatientRecord patient;  // Holds the current patient's data
@@ -68,14 +51,23 @@ private:
 
   // Input and validation methods
   bool valid_ssn(const string &ssn);
-  bool valid_state(const string &state); // Validates state using the database
-  bool valid_name(const string &name);   // Validates state using the database
+  bool valid_state(const string &state);
+  bool valid_name(const string &name);
+
+  /**
+   * Optional @returns the patient info, to avoid a runtime error if the user
+   * misinputs We then take this PDR Object and edit it to pass to a function
+   * that add an encounter to the encounters table
+   *
+   * @match_ssn / @match_lname are called based on user selection
+   * violates DRY so can be update to some template nonsense
+   */
   optional<PatientRecord> match_lname(const string &last_name);
   optional<PatientRecord> match_ssn(const string &ssn);
   optional<PatientRecord> lname_ssn();
-  bool valid_date(const string &date); // Validates the format of a date
 
-  // Methods for updating and adding injury records
+  bool valid_date(const string &date);
+
   void update_injury_record();
   void add_injury_record(const string &identifier);
   string set_icd_code();

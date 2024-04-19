@@ -21,22 +21,23 @@ void welcome() {
   gotoxy(2, 7, 36);
   printf("     \\/  \\/  \\___||_| \\___|\\___/ |_| |_| |_| \\___|(_)");
   gotoxy(0, 9, 34);
-  printf(
-      "========================================================="
-      "\n");
+  printf("========================================================="
+         "\n");
 }
 
 void display_menu() {
   gotoxy(16, 11, 33);
   printf(">>>> MAIN MENU <<<<");
   gotoxy(16, 13, 32);
-  printf("1. Update Profile");
+  printf("1. Create Encounter");
   gotoxy(16, 14, 32);
-  printf("2. Save Patient Info");
+  printf("2. Edit Patient Table");
   gotoxy(16, 15, 32);
-  printf("3. View Tables");
-  gotoxy(16, 16, 31);
-  printf("4. Exit");
+  printf("3. Edit Encounters Table");
+  gotoxy(16, 16, 32);
+  printf("4. View All Tables");
+  gotoxy(16, 17, 31);
+  printf("5. Exit");
   gotoxy(16, 20, 34);
   printf("Enter your choice: ");
 }
@@ -56,17 +57,17 @@ void pdr_prompt() {
 }
 
 // make more dynamic
-void info_header(char *message) {
+void info_header(char *message, int offset) {
   clear_console();
-  gotoxy(4, 1, 36);
+  gotoxy(offset, 1, 36);
   printf("=================================================");
-  gotoxy(4, 3, 36);
+  gotoxy(offset, 3, 36);
   printf("---=                 Hello                   =---");
-  gotoxy(4, 5, 36);
+  gotoxy(offset, 5, 36);
   printf("---=         %s         =---", message);
-  gotoxy(4, 7, 36);
+  gotoxy(offset, 7, 36);
   printf("---=            Enter [2] to save            =---");
-  gotoxy(4, 9, 36);
+  gotoxy(offset, 9, 36);
   printf("=================================================\n");
 }
 
@@ -79,7 +80,21 @@ void table_viewer() {
   gotoxy(0, 6, 36);
   printf("---=       Examine the DB Configuration      =---");
   gotoxy(0, 8, 36);
-  printf("---=          Enter [ENTER] to quit          =---");
+  printf("---=          Press [ENTER] to quit          =---");
   gotoxy(0, 10, 36);
+  printf("=================================================\n");
+}
+
+void injury_prompt() {
+  clear_console();
+  gotoxy(0, 2, 31);
+  printf("=================================================");
+  gotoxy(0, 4, 36);
+  printf("---=               ENCOUNTER                 =---");
+  gotoxy(0, 6, 36);
+  printf("---=          Enter the Injury Info          =---");
+  gotoxy(0, 8, 36);
+  printf("---=          Press [ENTER] to quit          =---");
+  gotoxy(0, 10, 31);
   printf("=================================================\n");
 }

@@ -5,9 +5,8 @@
 
 void gotoxy(int x, int y, int color_code) {
   printf("\033[%d;%dH", y, x);
-  if (color_code != -1) {
+  if (color_code != -1)
     printf("\033[1;%dm", color_code);
-  }
 }
 
 void reset_text_color() { printf("\033[0m"); }

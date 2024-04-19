@@ -1,4 +1,5 @@
 #include "db_controller.hpp"
+#include <cmath>
 
 DB_Manager::DB_Manager() : db(nullptr) {
   int rc = sqlite3_open("./docs/pdr.db", &db);
@@ -38,7 +39,7 @@ void DB_Manager::initialize_database() {
   }
 }
 
-void DB_Manager::execute_sql_file(const std::string &file_path) {
+void DB_Manager::execute_sql_file(const string &file_path) {
   // Attempt to open the provided SQL file.
   std::ifstream file(file_path);
   if (!file.is_open()) {
@@ -49,7 +50,7 @@ void DB_Manager::execute_sql_file(const std::string &file_path) {
   // converts the sql file to a giant string
   std::stringstream buffer;
   buffer << file.rdbuf();
-  std::string sql_commands = buffer.str();
+  string sql_commands = buffer.str();
 
   // throws it in sqlite3_exec
   char *message_error = nullptr;
@@ -61,15 +62,14 @@ void DB_Manager::execute_sql_file(const std::string &file_path) {
   }
 }
 
-bool DB_Manager::is_valid_state(const std::string &state_code) {
-  std::string sql = "SELECT NAME FROM states WHERE code = ?;";
+bool DB_Manager::is_valid_state(const string &state_code) {
+  string sql = "SELECT NAME FROM states WHERE code = ?;";
   sqlite3_stmt *stmt = nullptr;
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
     std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
               << std::endl;
     return false; // Indicates that state validation could not be performed due
-                  // to an error.
   }
 
   sqlite3_bind_text(stmt, 1, state_code.c_str(), -1, SQLITE_STATIC);
@@ -80,11 +80,11 @@ bool DB_Manager::is_valid_state(const std::string &state_code) {
   sqlite3_finalize(stmt);
 
   return isValid; // Return the validity of the state code based on query
-                  // result
 }
 
-bool DB_Manager::is_valid_icd_code(const std::string &icd_code) {
-  std::string sql = "SELECT * FROM ICD10S WHERE Code = ?;";
+bool DB_Manager::is_valid_icd_code(const string &icd_code) {
+  string sql =
+      "SELECT 1 FROM ICD10S WHERE Code = ? LIMIT 1;"; // More efficient query
   sqlite3_stmt *stmt = nullptr;
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -93,19 +93,30 @@ bool DB_Manager::is_valid_icd_code(const std::string &icd_code) {
     return false;
   }
 
-  sqlite3_bind_text(stmt, 1, icd_code.c_str(), -1, SQLITE_STATIC);
+  // Using SQLITE_TRANSIENT to ensure the string memory is managed by SQLite
+  if (sqlite3_bind_text(stmt, 1, icd_code.c_str(), -1, SQLITE_TRANSIENT) !=
+      SQLITE_OK) {
+    std::cerr << "Failed to bind ICD code: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt); // Finalize statement to avoid resource leaks
+    return false;
+  }
 
   bool isValid = sqlite3_step(stmt) == SQLITE_ROW;
 
   sqlite3_finalize(stmt);
-
   return isValid;
 }
 
-std::optional<PatientRecord>
-DB_Manager::match_user(const std::string &user_info) {
-  std::string sql = "SELECT SSN, LastName, Position, LastServiceDate, "
-                    "StateCode FROM PATIENTS WHERE LastName = ? OR SSN = ?;";
+// helper function not included in header
+string get_column_text(sqlite3_stmt *stmt, int column_index) {
+  const char *text =
+      reinterpret_cast<const char *>(sqlite3_column_text(stmt, column_index));
+  return text ? string(text) : "";
+}
+
+std::optional<PatientRecord> DB_Manager::match_user(const string &user_info) {
+  string sql = "SELECT SSN, LastName, Position, LastServiceDate, "
+               "StateCode FROM PATIENTS WHERE LastName = ? OR SSN = ?;";
   sqlite3_stmt *stmt = nullptr;
 
   if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -122,14 +133,10 @@ DB_Manager::match_user(const std::string &user_info) {
 
   if (sqlite3_step(stmt) == SQLITE_ROW) {
     record.ssn = reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
-    record.last_name =
-        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
-    record.position =
-        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2));
-    record.service_date =
-        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 3));
-    record.state_code =
-        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 4));
+    record.last_name = get_column_text(stmt, 1);
+    record.position = get_column_text(stmt, 2);
+    record.service_date = get_column_text(stmt, 3);
+    record.state_code = get_column_text(stmt, 4);
     record.valid = true;
   } else {
     record.valid = false; // Set valid to false if no record is found
@@ -139,6 +146,7 @@ DB_Manager::match_user(const std::string &user_info) {
   return record.valid ? std::optional<PatientRecord>(record) : std::nullopt;
 }
 
+// should be two functions
 void DB_Manager::view_tables() {
   const char *sql =
       "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
@@ -150,18 +158,17 @@ void DB_Manager::view_tables() {
     return;
   }
 
-  while (sqlite3_step(stmt) == SQLITE_ROW) {
+  while (sqlite3_step(stmt) == SQLITE_ROW)
     std::cout << "- " << sqlite3_column_text(stmt, 0) << std::endl;
-  }
 
   sqlite3_finalize(stmt);
 
   std::cout << "Enter a table name to see its Contents: " << std::endl;
-  std::string table;
+  string table;
   std::getline(std::cin, table); // Read the user input for table name
 
   // Construct SQL query to view contents of the specified table
-  std::string sql_table = "SELECT * FROM " + table + ";";
+  string sql_table = "SELECT * FROM " + table + ";";
 
   if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=
       SQLITE_OK) {
@@ -176,8 +183,6 @@ void DB_Manager::view_tables() {
     for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
       const char *text =
           reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
-      // sets the max length of each row to 11 (9 ssn + 2)
-      // pretty prints since we are setting the width of each row to be the same
       std::cout << std::left << std::setw(11) << text;
     }
     std::cout << std::endl;
@@ -210,11 +215,64 @@ void DB_Manager::view_patients() {
     for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
       const char *text =
           reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
-      // sets the max length of each row to 11 (9 ssn + 2)
-      // pretty prints since we are setting the width of each row to be the same
       std::cout << std::left << std::setw(11) << text;
     }
     std::cout << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}
+
+void DB_Manager::view_icd() {
+  string sql_table = "SELECT * FROM ICD10S;";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  // Execute the query and print the results
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    // Assuming the table has multiple columns, print each column's value
+    for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+      const char *text =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+      std::cout << "\033[1;37m";
+      std::cout << std::left << std::setw(5) << text;
+    }
+    std::cout << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}
+
+void DB_Manager::injury_controller(Injury new_injury) {
+  string sql = "INSERT INTO ENCOUNTERS (PatientSSN, ICD10Code, InjuryDate, "
+               "Description) VALUES (?,?,?,?)";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  }
+
+  sqlite3_bind_text(stmt, 1, new_injury.patient_ssn.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, new_injury.icd10_code.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, new_injury.injury_date.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, new_injury.description.c_str(), -1,
+                    SQLITE_TRANSIENT);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  } else {
+    std::cout << "Injury Recording Success" << std::endl;
   }
 
   sqlite3_finalize(stmt);
