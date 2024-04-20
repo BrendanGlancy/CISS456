@@ -33,10 +33,10 @@ void display_menu() {
   gotoxy(16, 14, 32);
   printf("2. Edit Patient Table");
   gotoxy(16, 15, 32);
-  printf("3. Edit Encounters Table");
+  printf("3. Edit ICD10S Table");
   gotoxy(16, 16, 32);
   printf("4. View All Tables");
-  gotoxy(16, 17, 31);
+  gotoxy(16, 18, 31);
   printf("5. Exit");
   gotoxy(16, 20, 34);
   printf("Enter your choice: ");

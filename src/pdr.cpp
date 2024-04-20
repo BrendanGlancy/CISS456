@@ -1,4 +1,5 @@
 #include "pdr.hpp"
+#include "db_controller.hpp"
 #include <cctype>
 #include <ctime>
 #include <iostream>
@@ -166,6 +167,10 @@ optional<PatientRecord> PDR::match_lname(const string &last_name) {
 
 optional<PatientRecord> PDR::match_ssn(const string &ssn) {
   return db.match_user(ssn);
+}
+
+optional<ICD10S> PDR::match_icd(const string &icd_code) {
+  return db.match_icd(icd_code);
 }
 
 bool PDR::valid_date(const string &date) {

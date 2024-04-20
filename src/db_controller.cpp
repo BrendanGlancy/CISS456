@@ -198,6 +198,35 @@ void DB_Manager::view_tables() {
   } while (input != '\n');
 }
 
+optional<ICD10S> DB_Manager::match_icd(const string &icd_code) {
+  string sql = "SELECT ICD10Code, Description FROM ICD10S WHERE CODE = ?;";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return std::nullopt; // Return an empty optional if the statement
+                         // preparation fails
+  }
+
+  sqlite3_bind_text(stmt, 1, icd_code.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, icd_code.c_str(), -1, SQLITE_STATIC);
+
+  ICD10S icd;
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    icd.icd10_code =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 0));
+    icd.description = get_column_text(stmt, 1);
+    icd.valid = true;
+  } else {
+    icd.valid = false; // Set valid to false if no injury is found
+  }
+
+  sqlite3_finalize(stmt);
+  return icd.valid ? std::optional<ICD10S>(icd) : std::nullopt;
+}
+
 void DB_Manager::view_patients() {
   string sql_table = "SELECT * FROM PATIENTS;";
   sqlite3_stmt *stmt;

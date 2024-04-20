@@ -48,6 +48,13 @@ struct Injury {
   Injury() : injury_id(0), valid(false) {} // Default constructor
 };
 
+struct ICD10S {
+  string icd10_code;
+  string description;
+  bool valid;
+
+  ICD10S() : valid(false) {} // Default constructor
+};
 class DB_Manager {
 public:
   DB_Manager();
@@ -73,6 +80,7 @@ public:
    * @returns bool
    */
   optional<PatientRecord> match_user(const string &user_info);
+  optional<ICD10S> match_icd(const string &icd_code);
 
   /**
    * Prints all tables to the console
