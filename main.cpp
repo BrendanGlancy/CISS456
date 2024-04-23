@@ -18,19 +18,19 @@ void prompt_init(char *message) {
 
 void collect_data(PDR &patient_info, char *message) {
   prompt_init(message);
-  patient_info.update_encounter();
+  patient_info.create_encounter();
 }
 
 void patients(PDR &patient_info) {
   char message[256] = " Welcome Patient Admin ";
   prompt_init(message);
-  patient_info.edit_patients();
+  patient_info.new_patient();
 }
 
 void ICD10S(PDR &patient_info) {
-  char message[256] = "  Welcome ICD10 Admin  ";
+  char message[256] = " Welcome Injury Admin  ";
   prompt_init(message);
-  patient_info.edit_ICD10S();
+  patient_info.edit_encounter();
 }
 
 int get_choice() {
@@ -49,7 +49,7 @@ int get_choice() {
 }
 
 int main() {
-  char message[256] = "  Saved PDR to DB  ";
+  char message[256] = " Welcome Patient Admin ";
 
   bool running = true;
 

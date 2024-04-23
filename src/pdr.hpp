@@ -39,10 +39,12 @@ public:
 
   /**
    * Initiates the process to update or add an injury record for a patient.
+   * Creates  a new patient record if the patient does not exist.
+   * Edits an existing patient record if the patient does exist.
    */
-  void update_encounter();
-  void edit_patients();
-  void edit_ICD10S();
+  void create_encounter();
+  void new_patient();
+  void edit_encounter();
 
 private:
   PatientRecord patient;  // Holds the current patient's data
@@ -71,6 +73,8 @@ private:
 
   void update_injury_record();
   void add_injury_record(const string &identifier);
+  void add_patient_record(PatientRecord &new_patient);
+  void edit_encounter_record(Injury &encounter);
   string set_icd_code();
   string set_injury_date();
   string set_description();

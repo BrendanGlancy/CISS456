@@ -26,6 +26,7 @@ void display_menu();
  * This function guides the user through the process of entering car details.
  */
 void pdr_prompt();
+void new_pdr();
 
 /**
  * Prompts the user to configure a car.

@@ -107,6 +107,8 @@ public:
    * Allows for the user to add an injury to the injury table
    */
   void injury_controller(Injury injury);
+  void patient_controller(PatientRecord patient);
+  void edit_encounter(Injury &encounter);
 
 private:
   sqlite3 *db;

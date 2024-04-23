@@ -31,9 +31,9 @@ void display_menu() {
   gotoxy(16, 13, 32);
   printf("1. Create Encounter");
   gotoxy(16, 14, 32);
-  printf("2. Edit Patient Table");
+  printf("2. Add a Patient");
   gotoxy(16, 15, 32);
-  printf("3. Edit ICD10S Table");
+  printf("3. Edit Encounters Table");
   gotoxy(16, 16, 32);
   printf("4. View All Tables");
   gotoxy(16, 18, 31);
@@ -56,6 +56,21 @@ void pdr_prompt() {
   printf("=================================================\n");
   gotoxy(0, 11, 36);
   printf("\n");
+}
+
+void new_pdr() {
+  clear_console();
+  gotoxy(0, 2, 36);
+  printf("=================================================");
+  gotoxy(0, 4, 36);
+  printf("---=             Add New Patient             =---");
+  gotoxy(0, 6, 36);
+  printf("---=       Please Enter the Patient Info     =---");
+  gotoxy(0, 8, 36);
+  printf("---=           Enter [Q/q] to quit           =---");
+  gotoxy(0, 10, 36);
+  printf("=================================================\n");
+  gotoxy(0, 11, 36);
 }
 
 // make more dynamic

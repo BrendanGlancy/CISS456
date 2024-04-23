@@ -1,8 +1,6 @@
 #include "pdr.hpp"
 #include "db_controller.hpp"
-#include <cctype>
-#include <ctime>
-#include <iostream>
+#include "menu.h"
 
 /**
  * Seperate function to display the prompt for an input
@@ -202,11 +200,37 @@ void PDR::add_injury_record(const string &ssn) {
   db.injury_controller(curr_injury);
 }
 
+void PDR::add_patient_record(PatientRecord &new_patient) {
+  clear_console();
+  new_pdr();
+
+  new_patient.last_name = set_lname();
+  new_patient.ssn = set_ssn();
+  new_patient.position = input_prompt("Position: ");
+  new_patient.service_date = set_injury_date();
+  new_patient.state_code = set_state();
+  db.patient_controller(new_patient);
+}
+
+void PDR::edit_encounter_record(Injury &encounter) {
+  clear_console();
+  pdr_prompt();
+  db.view_encounters();
+  // color code at beginning, very ugly
+  std::cout << "\033[0;31m================================================="
+            << std::endl;
+
+  encounter.icd10_code = set_icd_code();
+  encounter.injury_date = set_injury_date();
+  encounter.description = set_description();
+  db.edit_encounter(encounter);
+}
+
 /**
  * @info
  * Initiates the process to update or add an injury record for a patient.
  */
-void PDR::update_encounter() {
+void PDR::create_encounter() {
   try {
     std::optional<PatientRecord> curr_patient = lname_ssn();
     if (curr_patient) {
@@ -242,31 +266,10 @@ void PDR::update_encounter() {
   }
 }
 
-void PDR::edit_patients() {
+void PDR::new_patient() {
   try {
-    std::optional<PatientRecord> curr_patient = lname_ssn();
-    if (curr_patient) {
-      std::cout << "Patient found: " << std::endl;
-      std::cout << "SSN: " << curr_patient->ssn << std::endl;
-      std::cout << "Last Name: " << curr_patient->last_name << std::endl;
-      std::cout << "Position: " << curr_patient->position << std::endl;
-      std::cout << "Last Service Date: " << curr_patient->service_date
-                << std::endl;
-      std::cout << "State Code: " << curr_patient->state_code << std::endl;
-
-      add_injury_record(curr_patient->ssn);
-
-    } else {
-      std::cout << "No patient found. Please try again or add a new patient."
-                << std::endl;
-
-      std::cout << "Press <ENTER> To return to Main Menu" << std::endl;
-      char input;
-
-      do {
-        input = getchar();
-      } while (input != '\n');
-    }
+    PatientRecord new_patient;
+    add_patient_record(new_patient);
   } catch (const UserQuitException &e) {
     std::cerr << "User chose to quit: " << e.what() << std::endl;
     if (Menu_Callback)
@@ -278,10 +281,18 @@ void PDR::edit_patients() {
   }
 }
 
-void PDR::edit_ICD10S() {
+void PDR::edit_encounter() {
   try {
     std::optional<Injury> curr_encounter = match_description();
     if (curr_encounter) {
+      std::cout << "Encounter found: " << std::endl;
+      std::cout << "Injury ID: " << curr_encounter->injury_id << std::endl;
+      std::cout << "Patient SSN: " << curr_encounter->patient_ssn << std::endl;
+      std::cout << "ICD-10 Code: " << curr_encounter->icd10_code << std::endl;
+      std::cout << "Injury Date: " << curr_encounter->injury_date << std::endl;
+      std::cout << "Description: " << curr_encounter->description << std::endl;
+
+      add_injury_record(curr_encounter->patient_ssn);
     } else {
       std::cout << "We could not find this Encounter, Please Try again"
                 << std::endl;

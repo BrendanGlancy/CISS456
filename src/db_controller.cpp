@@ -325,8 +325,8 @@ void DB_Manager::view_encounters() {
     for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
       const char *text =
           reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
-      std::cout << "\033[1;37m";
-      std::cout << std::left << std::setw(5) << text;
+      std::cout << "\033[1;33m";
+      std::cout << std::left << std::setw(11) << text;
     }
     std::cout << std::endl;
   }
@@ -358,6 +358,62 @@ void DB_Manager::injury_controller(Injury new_injury) {
               << std::endl;
   } else {
     std::cout << "Injury Recording Success" << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}
+
+void DB_Manager::patient_controller(PatientRecord patient) {
+  string sql = "INSERT INTO PATIENTS (SSN, LastName, Position, "
+               "LastServiceDate, StateCode) VALUES (?,?,?,?,?)";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  }
+
+  sqlite3_bind_text(stmt, 1, patient.ssn.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, patient.last_name.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, patient.position.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, patient.service_date.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 5, patient.state_code.c_str(), -1, SQLITE_TRANSIENT);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  } else {
+    std::cout << "Patient Recording Success" << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}
+
+void DB_Manager::edit_encounter(Injury &encounter) {
+  string sql = "UPDATE ENCOUNTERS SET ICD10Code = ?, InjuryDate = ?, "
+               "Description = ? WHERE PatientSSN = ?;";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  }
+
+  sqlite3_bind_text(stmt, 1, encounter.icd10_code.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, encounter.injury_date.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, encounter.description.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, encounter.patient_ssn.c_str(), -1,
+                    SQLITE_TRANSIENT);
+
+  if (sqlite3_step(stmt) != SQLITE_DONE) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+  } else {
+    std::cout << "Encounter Edit Success" << std::endl;
   }
 
   sqlite3_finalize(stmt);
