@@ -49,7 +49,7 @@ int get_choice() {
 }
 
 int main() {
-  char message[256] = " Welcome to PDR System ";
+  char message[256] = "  Saved PDR to DB  ";
 
   bool running = true;
 

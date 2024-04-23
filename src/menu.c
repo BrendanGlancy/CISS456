@@ -54,6 +54,8 @@ void pdr_prompt() {
   printf("---=           Enter [Q/q] to quit           =---");
   gotoxy(0, 10, 36);
   printf("=================================================\n");
+  gotoxy(0, 11, 36);
+  printf("\n");
 }
 
 // make more dynamic

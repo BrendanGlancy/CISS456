@@ -198,6 +198,36 @@ void DB_Manager::view_tables() {
   } while (input != '\n');
 }
 
+optional<Injury> DB_Manager::match_description(const string &description) {
+  string sql = "SELECT PatientSSN, ICD10Code, InjuryDate, Description FROM "
+               "ENCOUNTERS WHERE DESCRIPTION = ?;";
+  sqlite3_stmt *stmt = nullptr;
+
+  if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return std::nullopt; // Return an empty optional if the statement
+                         // preparation fails
+  }
+
+  sqlite3_bind_text(stmt, 1, description.c_str(), -1, SQLITE_STATIC);
+
+  Injury injury;
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+    injury.patient_ssn = get_column_text(stmt, 0);
+    injury.icd10_code =
+        reinterpret_cast<const char *>(sqlite3_column_text(stmt, 1));
+    injury.description = get_column_text(stmt, 2);
+    injury.valid = true;
+  } else {
+    injury.valid = false; // Set valid to false if no injury is found
+  }
+
+  sqlite3_finalize(stmt);
+  return injury.valid ? std::optional<Injury>(injury) : std::nullopt;
+}
+
 optional<ICD10S> DB_Manager::match_icd(const string &icd_code) {
   string sql = "SELECT ICD10Code, Description FROM ICD10S WHERE CODE = ?;";
   sqlite3_stmt *stmt = nullptr;
@@ -254,6 +284,32 @@ void DB_Manager::view_patients() {
 
 void DB_Manager::view_icd() {
   string sql_table = "SELECT * FROM ICD10S;";
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=
+      SQLITE_OK) {
+    std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db)
+              << std::endl;
+    return;
+  }
+
+  // Execute the query and print the results
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    // Assuming the table has multiple columns, print each column's value
+    for (int i = 0; i < sqlite3_column_count(stmt); ++i) {
+      const char *text =
+          reinterpret_cast<const char *>(sqlite3_column_text(stmt, i));
+      std::cout << "\033[1;37m";
+      std::cout << std::left << std::setw(5) << text;
+    }
+    std::cout << std::endl;
+  }
+
+  sqlite3_finalize(stmt);
+}
+
+void DB_Manager::view_encounters() {
+  string sql_table = "SELECT * FROM ENCOUNTERS;";
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db, sql_table.c_str(), -1, &stmt, nullptr) !=

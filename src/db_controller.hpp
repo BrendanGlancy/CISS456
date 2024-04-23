@@ -81,6 +81,7 @@ public:
    */
   optional<PatientRecord> match_user(const string &user_info);
   optional<ICD10S> match_icd(const string &icd_code);
+  optional<Injury> match_description(const string &description);
 
   /**
    * Prints all tables to the console
@@ -96,6 +97,11 @@ public:
    * Prints patients from the db
    */
   void view_icd();
+
+  /**
+   * Prints patients from the db
+   */
+  void view_encounters();
 
   /**
    * Allows for the user to add an injury to the injury table

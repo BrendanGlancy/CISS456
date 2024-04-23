@@ -109,6 +109,7 @@ string PDR::set_state() {
 
 optional<PatientRecord> PDR::lname_ssn() {
   db.view_patients();
+  std::cout << std::endl;
   while (true) {
     string input = input_prompt("Find Patient by Last Name or SSN [L/s]: ");
     if (!input.empty()) {
@@ -122,6 +123,12 @@ optional<PatientRecord> PDR::lname_ssn() {
       }
     }
   }
+}
+
+optional<Injury> PDR::match_description() {
+  db.view_encounters();
+  string description = set_description();
+  return db.match_description(description);
 }
 
 bool PDR::valid_ssn(const string &ssn) {
@@ -169,7 +176,9 @@ optional<PatientRecord> PDR::match_ssn(const string &ssn) {
   return db.match_user(ssn);
 }
 
-optional<ICD10S> PDR::match_icd(const string &icd_code) {
+optional<ICD10S> PDR::match_icd() {
+  db.view_icd();
+  string icd_code = set_icd_code();
   return db.match_icd(icd_code);
 }
 
@@ -271,20 +280,10 @@ void PDR::edit_patients() {
 
 void PDR::edit_ICD10S() {
   try {
-    std::optional<PatientRecord> curr_patient = lname_ssn();
-    if (curr_patient) {
-      std::cout << "Patient found: " << std::endl;
-      std::cout << "SSN: " << curr_patient->ssn << std::endl;
-      std::cout << "Last Name: " << curr_patient->last_name << std::endl;
-      std::cout << "Position: " << curr_patient->position << std::endl;
-      std::cout << "Last Service Date: " << curr_patient->service_date
-                << std::endl;
-      std::cout << "State Code: " << curr_patient->state_code << std::endl;
-
-      add_injury_record(curr_patient->ssn);
-
+    std::optional<Injury> curr_encounter = match_description();
+    if (curr_encounter) {
     } else {
-      std::cout << "No patient found. Please try again or add a new patient."
+      std::cout << "We could not find this Encounter, Please Try again"
                 << std::endl;
 
       std::cout << "Press <ENTER> To return to Main Menu" << std::endl;

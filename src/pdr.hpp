@@ -65,8 +65,8 @@ private:
   optional<PatientRecord> match_lname(const string &last_name);
   optional<PatientRecord> match_ssn(const string &ssn);
   optional<PatientRecord> lname_ssn();
-  optional<Injury> match_description(const string &description);
-  optional<ICD10S> match_icd(const string &icd_code);
+  optional<Injury> match_description();
+  optional<ICD10S> match_icd();
   bool valid_date(const string &date);
 
   void update_injury_record();
