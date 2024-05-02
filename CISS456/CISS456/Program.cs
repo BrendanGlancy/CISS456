@@ -1,2 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿class PDR
+{
+    Console.WriteLine("Hello World");
+}
