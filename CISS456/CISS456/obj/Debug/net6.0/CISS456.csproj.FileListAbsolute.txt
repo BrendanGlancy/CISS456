@@ -1,0 +1,15 @@
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\CISS456.exe
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\CISS456.deps.json
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\CISS456.runtimeconfig.json
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\CISS456.dll
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\ref\CISS456.dll
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\bin\Debug\net6.0\CISS456.pdb
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.csproj.AssemblyReference.cache
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.AssemblyInfoInputs.cache
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.AssemblyInfo.cs
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.csproj.CoreCompileInputs.cache
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.dll
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\ref\CISS456.dll
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.pdb
+C:\Users\dreadpirate\source\repos\BrendanGlancy\CISS456\CISS456\CISS456\obj\Debug\net6.0\CISS456.genruntimeconfig.cache
