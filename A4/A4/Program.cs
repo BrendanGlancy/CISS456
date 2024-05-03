@@ -25,12 +25,10 @@ namespace HelloWorldSample
                 ";
                 command.Parameters.AddWithValue("$code", code);
                 #endregion
-                command.ExecuteNonQuery();
 
                 var state = command.ExecuteScalar();
                 Console.WriteLine($"Your State is {state}.");
             }
-
         }
     }
 }
