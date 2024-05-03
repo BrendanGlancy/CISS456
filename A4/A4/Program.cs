@@ -12,6 +12,8 @@ namespace HelloWorldSample
             {
                 connection.Open();
 
+                var command = connection.CreateCommand();
+
                 // Ask the User for A state code
                 Console.Write("State Code: ");
                 var code = Console.ReadLine();
